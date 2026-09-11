@@ -31,7 +31,6 @@ const adminNav = [
 ]
 
 const clienteNav = [
-  { to: '/', label: 'Início', icon: Home, end: true },
   { to: '/biolink', label: 'BioLink', icon: Link2 },
   { to: '/aplicativos-mobile', label: 'Aplicativos Mobile', icon: Smartphone },
 ]

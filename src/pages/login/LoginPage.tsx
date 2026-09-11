@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, ArrowUpRight } from 'lucide-react'
+import { TipoUsuario } from '@/types/enums'
 import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/context/ToastContext'
 import { redefinirSenha, solicitarRecuperacao, verificarCodigo } from '@/lib/api/auth'
@@ -34,8 +35,8 @@ export function LoginPage() {
     if (!senha) return setError('Informe sua senha.')
     setLoading(true)
     try {
-      await login(email, senha)
-      navigate('/', { replace: true })
+      const usuario = await login(email, senha)
+      navigate(usuario.tipo === TipoUsuario.ADMIN ? '/' : '/biolink', { replace: true })
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Não foi possível entrar.')
     } finally {

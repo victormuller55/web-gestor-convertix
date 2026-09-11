@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import {
   Area,
   AreaChart,
@@ -36,7 +36,10 @@ export function DashboardPage() {
   const { data, isLoading, error } = useQuery({
     queryKey: ['dashboard-inicio'],
     queryFn: () => obterDashboardInicio({ meses: 12, limite_atividades: 8, limite_alertas: 8, limite_tops: 5 }),
+    enabled: isAdmin,
   })
+
+  if (!isAdmin) return <Navigate to="/biolink" replace />
 
   if (isLoading) {
     return (
@@ -61,52 +64,37 @@ export function DashboardPage() {
   return (
     <PageScroll>
       <PageHeader
-        eyebrow={isAdmin ? 'Visão da operação' : 'Sua conta'}
-        title={isAdmin ? 'O que está acontecendo agora' : 'Resumo da sua operação'}
-        description={
-          isAdmin
-            ? 'Receita, assinaturas, clientes e os pontos que pedem atenção hoje.'
-            : 'Acompanhe seus sites, cobranças e o status da assinatura.'
-        }
+        eyebrow="Visão da operação"
+        title="O que está acontecendo agora"
+        description="Receita, assinaturas, clientes e os pontos que pedem atenção hoje."
       />
 
       <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {isAdmin ? (
-          <>
-            <KpiCard
-              label="Receita do mês"
-              value={formatMoney(kpis?.receita_mes_atual)}
-              hint={`MRR estimado ${formatMoney(kpis?.mrr_estimado)}`}
-              icon={<CreditCard className="size-4" />}
-              tone="brand"
-            />
-            <KpiCard
-              label="Em aberto"
-              value={formatMoney(kpis?.total_pendente)}
-              hint={`${kpis?.quantidade_pendentes ?? 0} cobranças pendentes`}
-              tone="warn"
-            />
-            <KpiCard
-              label="Assinaturas ativas"
-              value={kpis?.assinaturas_ativas ?? 0}
-              hint={`${kpis?.total_clientes ?? 0} clientes`}
-              icon={<Users className="size-4" />}
-            />
-            <KpiCard
-              label="Sites e BioLinks"
-              value={`${kpis?.total_sites ?? 0}`}
-              hint={`${kpis?.total_biolinks ?? 0} BioLinks`}
-              icon={<Globe className="size-4" />}
-            />
-          </>
-        ) : (
-          <>
-            <KpiCard label="Pago no mês" value={formatMoney(kpis?.receita_mes_atual)} tone="brand" />
-            <KpiCard label="Total pago" value={formatMoney(kpis?.total_pago)} />
-            <KpiCard label="Em aberto" value={formatMoney(kpis?.total_pendente)} tone="warn" />
-            <KpiCard label="Meus sites" value={kpis?.total_sites ?? 0} hint={`${kpis?.total_biolinks ?? 0} BioLinks`} />
-          </>
-        )}
+        <KpiCard
+          label="Receita do mês"
+          value={formatMoney(kpis?.receita_mes_atual)}
+          hint={`MRR estimado ${formatMoney(kpis?.mrr_estimado)}`}
+          icon={<CreditCard className="size-4" />}
+          tone="brand"
+        />
+        <KpiCard
+          label="Em aberto"
+          value={formatMoney(kpis?.total_pendente)}
+          hint={`${kpis?.quantidade_pendentes ?? 0} cobranças pendentes`}
+          tone="warn"
+        />
+        <KpiCard
+          label="Assinaturas ativas"
+          value={kpis?.assinaturas_ativas ?? 0}
+          hint={`${kpis?.total_clientes ?? 0} clientes`}
+          icon={<Users className="size-4" />}
+        />
+        <KpiCard
+          label="Sites e BioLinks"
+          value={`${kpis?.total_sites ?? 0}`}
+          hint={`${kpis?.total_biolinks ?? 0} BioLinks`}
+          icon={<Globe className="size-4" />}
+        />
       </div>
 
       <div className="mb-6 grid gap-4 xl:grid-cols-[1.4fr_0.8fr]">
@@ -159,7 +147,7 @@ export function DashboardPage() {
           </div>
         </section>
 
-        {isAdmin && data.funil ? (
+        {data.funil ? (
           <section className="rounded-3xl border border-line bg-card p-5 shadow-sm">
             <h3 className="mb-4 font-display text-xl">Funil de conversão</h3>
             <div className="space-y-3">
@@ -169,19 +157,7 @@ export function DashboardPage() {
               <FunilRow label="Com pagamento" value={data.funil.clientes_com_pagamento_pago ?? 0} hint={formatPercent((data.funil.taxas?.cliente_para_pago ?? 0) * 100)} />
             </div>
           </section>
-        ) : (
-          <section className="rounded-3xl border border-line bg-card p-5 shadow-sm">
-            <h3 className="mb-4 font-display text-xl">Assinatura em destaque</h3>
-            {data.assinatura_destaque?.ativa ? (
-              <div>
-                <p className="font-display text-3xl">{formatMoney(data.assinatura_destaque.valor)}</p>
-                <p className="mt-2 text-sm text-muted">{data.assinatura_destaque.descricao}</p>
-              </div>
-            ) : (
-              <p className="text-sm text-muted">Nenhuma assinatura ativa no momento.</p>
-            )}
-          </section>
-        )}
+        ) : null}
       </div>
 
       <div className="grid gap-4 xl:grid-cols-2">
@@ -198,7 +174,7 @@ export function DashboardPage() {
                 type="button"
                 onClick={() => {
                   if (alerta.entidade === 'PAGAMENTO') navigate('/pagamentos')
-                  if (alerta.entidade === 'SITE') navigate(isAdmin ? '/sites' : '/biolink')
+                  if (alerta.entidade === 'SITE') navigate('/sites')
                   if (alerta.entidade === 'ASSINATURA') navigate('/assinaturas')
                 }}
                 className="block w-full rounded-2xl bg-paper px-4 py-3 text-left"

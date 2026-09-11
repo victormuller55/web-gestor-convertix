@@ -8,13 +8,13 @@ export function ProtectedRoute({ adminOnly = false }: { adminOnly?: boolean }) {
 
   if (!ready) return <PageSpinner />
   if (!user) return <Navigate to="/login" replace state={{ from: location.pathname }} />
-  if (adminOnly && !isAdmin) return <Navigate to="/" replace />
+  if (adminOnly && !isAdmin) return <Navigate to="/biolink" replace />
   return <Outlet />
 }
 
 export function GuestRoute() {
-  const { user, ready } = useAuth()
+  const { user, ready, isAdmin } = useAuth()
   if (!ready) return <PageSpinner />
-  if (user) return <Navigate to="/" replace />
+  if (user) return <Navigate to={isAdmin ? '/' : '/biolink'} replace />
   return <Outlet />
 }
