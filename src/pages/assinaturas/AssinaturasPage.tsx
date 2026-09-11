@@ -43,7 +43,7 @@ export function AssinaturasPage() {
   const queryClient = useQueryClient()
 
   const [page, setPage] = useState(0)
-  const [status, setStatus] = useState('')
+  const [status, setStatus] = useState<string>(StatusAssinatura.ACTIVE)
   const [novoOpen, setNovoOpen] = useState(false)
   const [detalheId, setDetalheId] = useState<number | null>(null)
   const [cancelTarget, setCancelTarget] = useState<Assinatura | null>(null)
