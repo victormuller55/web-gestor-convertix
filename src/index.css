@@ -383,6 +383,20 @@ a,
 button,
 [role='button'] {
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+@media (max-width: 767px) {
+  .modal-footer > .flex {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: stretch;
+  }
+
+  .modal-footer button {
+    width: 100%;
+    min-height: 44px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

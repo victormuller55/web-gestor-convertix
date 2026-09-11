@@ -129,7 +129,7 @@ export function LoginPage() {
         </div>
       </section>
 
-      <section className="flex items-center justify-center bg-paper px-6 py-12">
+      <section className="flex items-center justify-center bg-paper px-5 py-10 md:px-6 md:py-12">
         <div className="w-full max-w-md">
           <div className="mb-8 lg:hidden">
             <img src={logoGreen} alt="Convertix" className="h-8 w-auto max-w-[180px] object-contain object-left" />
@@ -147,7 +147,7 @@ export function LoginPage() {
               Voltar
             </button>
           )}
-          <h2 className="font-display text-4xl text-ink">
+          <h2 className="font-display text-3xl text-ink md:text-4xl">
             {step === 'login' && 'Entrar no gestor'}
             {step === 'email' && 'Recuperar senha'}
             {step === 'codigo' && 'Código enviado'}

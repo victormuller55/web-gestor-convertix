@@ -45,7 +45,7 @@ function FieldWrap({
 }) {
   return (
     <div className={cn('block space-y-1', className)}>
-      {label && <span className="text-xs font-medium text-ink">{label}</span>}
+      {label && <span className="text-sm font-medium text-ink md:text-xs">{label}</span>}
       {children}
       {error ? (
         <span className="text-xs text-danger">{error}</span>
@@ -117,7 +117,20 @@ export function Select({
 
   return (
     <FieldWrap label={label} error={error} hint={hint} className={className}>
-      <div ref={rootRef} className="relative">
+      <select
+        {...props}
+        value={current}
+        disabled={disabled}
+        onChange={onChange}
+        className={cn(
+          'min-h-11 w-full rounded-xl border border-line bg-card px-3 py-3 text-base text-ink outline-none transition-all duration-200',
+          'focus:border-brand focus:ring-4 focus:ring-brand/15 disabled:bg-paper disabled:text-muted md:hidden',
+        )}
+      >
+        {children}
+      </select>
+
+      <div ref={rootRef} className="relative hidden md:block">
         <button
           type="button"
           disabled={disabled}
@@ -232,7 +245,7 @@ export function SearchInput({
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         className={cn(
-          'search-input w-full rounded-xl border bg-card py-2.5 pr-3 pl-10 text-sm text-ink outline-none transition-all duration-200',
+          'search-input w-full rounded-xl border bg-card py-3 pr-3 pl-10 text-base text-ink outline-none transition-all duration-200 md:py-2.5 md:text-sm',
           'placeholder:text-muted/70',
           focused
             ? 'border-brand ring-4 ring-brand/15'

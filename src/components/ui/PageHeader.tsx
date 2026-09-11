@@ -26,7 +26,11 @@ export function PageHeader({
           <p className="mt-0.5 max-w-2xl text-sm leading-5 text-muted">{description}</p>
         )}
       </div>
-      {actions && <div className="flex shrink-0 flex-wrap gap-2 pb-1.5">{actions}</div>}
+      {actions && (
+        <div className="flex w-full shrink-0 flex-wrap gap-2 pb-1.5 max-sm:[&_button]:w-full sm:w-auto">
+          {actions}
+        </div>
+      )}
     </div>
   )
 }

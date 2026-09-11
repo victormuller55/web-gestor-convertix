@@ -62,12 +62,13 @@ export function AppShell() {
       )}
 
       <div className="flex h-dvh min-h-0 flex-col overflow-hidden">
-        <header className="flex shrink-0 items-center justify-between border-b border-line bg-card/90 px-4 py-2 backdrop-blur md:px-6">
+        <header className="flex shrink-0 items-center justify-between border-b border-line bg-card/90 px-4 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] backdrop-blur md:px-6 md:pt-2">
           <div className="flex items-center gap-3">
             <button
               type="button"
-              className="ui-press rounded-xl border border-line bg-card p-2 lg:hidden"
+              className="ui-press grid size-11 place-items-center rounded-xl border border-line bg-card lg:hidden"
               onClick={openDrawer}
+              aria-label="Abrir menu"
             >
               <Menu className="size-5" />
             </button>

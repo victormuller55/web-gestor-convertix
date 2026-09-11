@@ -23,53 +23,87 @@ export function Table<T>({
     return empty ?? null
   }
 
+  const titleCol = columns.find((col) => col.key !== 'acoes')
+  const actionCol = columns.find((col) => col.key === 'acoes')
+  const detailCols = columns.filter((col) => col.key !== 'acoes' && col !== titleCol)
+
   return (
-    <table className="min-w-full text-left text-sm">
-      <thead className="sticky top-0 z-10">
-        <tr className="border-b border-line bg-card text-xs tracking-wide text-muted uppercase shadow-[0_1px_0_0_var(--color-line)]">
-          {columns.map((col, index) => (
-            <th
-              key={col.key}
-              className={cn(
-                'bg-card py-3 font-semibold',
-                col.key === 'acoes'
-                  ? 'w-[1%] whitespace-nowrap pl-8 pr-4'
-                  : columns[index + 1]?.key === 'acoes'
-                    ? 'w-[1%] whitespace-nowrap pl-4 pr-4'
-                    : 'px-4',
-                col.className,
-              )}
-            >
-              {col.header}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
+    <>
+      <div className="space-y-3 md:hidden">
         {rows.map((row) => (
-          <tr
+          <article
             key={rowKey(row)}
-            className="border-b border-line/70 transition-colors duration-200 last:border-0 hover:bg-paper"
+            className="rounded-2xl border border-line bg-card p-4 shadow-sm"
           >
-            {columns.map((col, index) => (
-              <td
-                key={col.key}
-                className={cn(
-                  'align-middle py-3.5',
-                  col.key === 'acoes'
-                    ? 'w-[1%] whitespace-nowrap pl-8 pr-4'
-                    : columns[index + 1]?.key === 'acoes'
-                      ? 'w-[1%] whitespace-nowrap pl-4 pr-4'
-                      : 'px-4',
-                  col.className,
-                )}
-              >
-                {col.render(row)}
-              </td>
-            ))}
-          </tr>
+            {titleCol && <div className="min-w-0 leading-snug">{titleCol.render(row)}</div>}
+            {detailCols.length > 0 && (
+              <dl className="mt-3 space-y-2.5">
+                {detailCols.map((col) => (
+                  <div key={col.key} className="flex items-start justify-between gap-3">
+                    <dt className="shrink-0 pt-0.5 text-[11px] font-semibold tracking-wide text-muted uppercase">
+                      {col.header}
+                    </dt>
+                    <dd className="min-w-0 text-right text-sm text-ink">{col.render(row)}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+            {actionCol && (
+              <div className="mt-3 flex justify-end border-t border-line pt-3">{actionCol.render(row)}</div>
+            )}
+          </article>
         ))}
-      </tbody>
-    </table>
+      </div>
+
+      <div className="hidden md:block">
+        <table className="min-w-full text-left text-sm">
+          <thead className="sticky top-0 z-10">
+            <tr className="border-b border-line bg-card text-xs tracking-wide text-muted uppercase shadow-[0_1px_0_0_var(--color-line)]">
+              {columns.map((col, index) => (
+                <th
+                  key={col.key}
+                  className={cn(
+                    'bg-card py-3 font-semibold',
+                    col.key === 'acoes'
+                      ? 'w-[1%] whitespace-nowrap pl-8 pr-4'
+                      : columns[index + 1]?.key === 'acoes'
+                        ? 'w-[1%] whitespace-nowrap pl-4 pr-4'
+                        : 'px-4',
+                    col.className,
+                  )}
+                >
+                  {col.header}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr
+                key={rowKey(row)}
+                className="border-b border-line/70 transition-colors duration-200 last:border-0 hover:bg-paper"
+              >
+                {columns.map((col, index) => (
+                  <td
+                    key={col.key}
+                    className={cn(
+                      'align-middle py-3.5',
+                      col.key === 'acoes'
+                        ? 'w-[1%] whitespace-nowrap pl-8 pr-4'
+                        : columns[index + 1]?.key === 'acoes'
+                          ? 'w-[1%] whitespace-nowrap pl-4 pr-4'
+                          : 'px-4',
+                      col.className,
+                    )}
+                  >
+                    {col.render(row)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   )
 }

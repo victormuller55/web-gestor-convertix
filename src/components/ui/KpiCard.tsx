@@ -26,7 +26,7 @@ export function KpiCard({
         <span className="text-xs font-semibold tracking-wide uppercase">{label}</span>
         {icon}
       </div>
-      <div className="font-display text-3xl text-ink">{value}</div>
+      <div className="font-display text-2xl text-ink md:text-3xl">{value}</div>
       {hint && <p className="mt-2 text-xs text-muted">{hint}</p>}
     </article>
   )

@@ -18,7 +18,7 @@ export function Field({
 }: FieldProps & { children: ReactNode }) {
   return (
     <label className={cn('block space-y-1', className)}>
-      {label && <span className="text-xs font-medium text-ink">{label}</span>}
+      {label && <span className="text-sm font-medium text-ink md:text-xs">{label}</span>}
       {children}
       {error ? (
         <span className="text-xs text-danger">{error}</span>
@@ -30,7 +30,7 @@ export function Field({
 }
 
 const controlClass =
-  'w-full rounded-xl border border-line bg-card px-3 py-2 text-sm text-ink outline-none transition-all duration-200 placeholder:text-muted/70 focus:border-brand focus:ring-4 focus:ring-brand/15 disabled:bg-paper disabled:text-muted'
+  'w-full min-h-11 rounded-xl border border-line bg-card px-3 py-3 text-base text-ink outline-none transition-all duration-200 placeholder:text-muted/70 focus:border-brand focus:ring-4 focus:ring-brand/15 disabled:bg-paper disabled:text-muted md:min-h-0 md:py-2 md:text-sm'
 
 export function Input({
   label,
