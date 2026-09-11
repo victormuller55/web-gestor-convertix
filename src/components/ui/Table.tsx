@@ -23,19 +23,27 @@ export function Table<T>({
     return empty ?? null
   }
 
-  const titleCol = columns.find((col) => col.key !== 'acoes')
+  const photoCol = columns.find((col) => col.key === 'foto')
+  const titleCol = columns.find((col) => col.key !== 'acoes' && col.key !== 'foto')
   const actionCol = columns.find((col) => col.key === 'acoes')
-  const detailCols = columns.filter((col) => col.key !== 'acoes' && col !== titleCol)
+  const detailCols = columns.filter(
+    (col) => col.key !== 'acoes' && col.key !== 'foto' && col !== titleCol,
+  )
 
   return (
     <>
-      <div className="space-y-3 md:hidden">
+      <div className="md:hidden">
         {rows.map((row) => (
           <article
             key={rowKey(row)}
-            className="rounded-2xl border border-line bg-card p-4 shadow-sm"
+            className="border-b border-line bg-card p-4"
           >
-            {titleCol && <div className="min-w-0 leading-snug">{titleCol.render(row)}</div>}
+            {titleCol && (
+              <div className="flex min-w-0 items-center gap-3 leading-snug">
+                {photoCol ? <div className="shrink-0">{photoCol.render(row)}</div> : null}
+                <div className="min-w-0">{titleCol.render(row)}</div>
+              </div>
+            )}
             {detailCols.length > 0 && (
               <dl className="mt-3 space-y-2.5">
                 {detailCols.map((col) => (

@@ -102,14 +102,15 @@ export function ClientesPage() {
   const columns = useMemo<Column<Cliente>[]>(
     () => [
       {
+        key: 'foto',
+        header: 'Foto',
+        className: 'w-14',
+        render: (row) => <Avatar name={row.nome_empresa} src={row.foto} />,
+      },
+      {
         key: 'empresa',
-        header: 'Cliente',
-        render: (row) => (
-          <div className="flex items-center gap-3">
-            <Avatar name={row.nome_empresa} src={row.foto} />
-            <p className="font-semibold">{row.nome_empresa}</p>
-          </div>
-        ),
+        header: 'Nome',
+        render: (row) => <p className="font-semibold">{row.nome_empresa}</p>,
       },
       { key: 'email', header: 'E-mail', render: (row) => row.email || '—' },
       {

@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, ArrowUpRight } from 'lucide-react'
+import { AlertCircle, ArrowLeft, ArrowUpRight } from 'lucide-react'
 import { TipoUsuario } from '@/types/enums'
 import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/context/ToastContext'
@@ -14,11 +14,14 @@ import logoGreen from '@/assets/logos/logo_convertix_green.png'
 
 type Step = 'login' | 'email' | 'codigo' | 'senha'
 
+const STEP_ORDER: Step[] = ['login', 'email', 'codigo', 'senha']
+
 export function LoginPage() {
   const { login } = useAuth()
   const { push } = useToast()
   const navigate = useNavigate()
   const [step, setStep] = useState<Step>('login')
+  const [stepDir, setStepDir] = useState<'forward' | 'back'>('forward')
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [codigo, setCodigo] = useState('')
@@ -27,6 +30,13 @@ export function LoginPage() {
   const [usuarioId, setUsuarioId] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+
+  function goTo(next: Step) {
+    if (next === step) return
+    setError('')
+    setStepDir(STEP_ORDER.indexOf(next) >= STEP_ORDER.indexOf(step) ? 'forward' : 'back')
+    setStep(next)
+  }
 
   async function onLogin(event: FormEvent) {
     event.preventDefault()
@@ -52,7 +62,7 @@ export function LoginPage() {
     try {
       const res = await solicitarRecuperacao(email)
       setUsuarioId(res.usuario_id)
-      setStep('codigo')
+      goTo('codigo')
       push(res.mensagem || 'Código enviado para o e-mail.', 'success')
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Não foi possível enviar o código.')
@@ -72,7 +82,7 @@ export function LoginPage() {
         setError(res.mensagem || 'Código inválido.')
         return
       }
-      setStep('senha')
+      goTo('senha')
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Código inválido.')
     } finally {
@@ -91,7 +101,7 @@ export function LoginPage() {
       await redefinirSenha(usuarioId, codigo, novaSenha)
       push('Senha redefinida. Entre com a nova senha.', 'success')
       setSenha('')
-      setStep('login')
+      goTo('login')
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Não foi possível redefinir a senha.')
     } finally {
@@ -129,18 +139,16 @@ export function LoginPage() {
         </div>
       </section>
 
-      <section className="flex items-center justify-center bg-paper px-5 py-10 md:px-6 md:py-12">
+      <section className="flex items-center justify-center overflow-hidden bg-paper px-5 py-10 md:px-6 md:py-12">
         <div className="w-full max-w-md">
           <div className="mb-8 lg:hidden">
             <img src={logoGreen} alt="Convertix" className="h-8 w-auto max-w-[180px] object-contain object-left" />
           </div>
+          <div key={step} className={stepDir === 'forward' ? 'auth-step-forward' : 'auth-step-back'}>
           {step !== 'login' && (
             <button
               type="button"
-              onClick={() => {
-                setError('')
-                setStep(step === 'email' ? 'login' : 'email')
-              }}
+              onClick={() => goTo(step === 'email' ? 'login' : 'email')}
               className="mb-4 inline-flex items-center gap-2 text-sm text-muted hover:text-ink"
             >
               <ArrowLeft className="size-4" />
@@ -153,12 +161,14 @@ export function LoginPage() {
             {step === 'codigo' && 'Código enviado'}
             {step === 'senha' && 'Nova senha'}
           </h2>
-          <p className="mt-2 mb-8 text-sm text-muted">
+          <p className="mt-2 mb-4 text-sm text-muted">
             {step === 'login' && 'Use o e-mail da sua conta Convertix.'}
             {step === 'email' && 'Enviaremos um código de 6 dígitos para o e-mail cadastrado.'}
             {step === 'codigo' && 'Digite o código recebido para continuar.'}
             {step === 'senha' && 'Defina uma senha com no mínimo 8 caracteres.'}
           </p>
+
+          {error ? <AuthError message={error} /> : null}
 
           {step === 'login' && (
             <form className="space-y-4" onSubmit={onLogin}>
@@ -169,17 +179,13 @@ export function LoginPage() {
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
               />
-              {error && <p className="text-sm text-danger">{error}</p>}
               <Button type="submit" className="w-full" loading={loading}>
                 Entrar
               </Button>
               <button
                 type="button"
                 className="w-full text-sm text-muted hover:text-ink"
-                onClick={() => {
-                  setError('')
-                  setStep('email')
-                }}
+                onClick={() => goTo('email')}
               >
                 Esqueci minha senha
               </button>
@@ -189,7 +195,6 @@ export function LoginPage() {
           {step === 'email' && (
             <form className="space-y-4" onSubmit={onRecuperar}>
               <Input label="E-mail" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-              {error && <p className="text-sm text-danger">{error}</p>}
               <Button type="submit" className="w-full" loading={loading}>
                 Enviar código
               </Button>
@@ -205,7 +210,6 @@ export function LoginPage() {
                 value={codigo}
                 onChange={(e) => setCodigo(e.target.value.replace(/\D/g, '').slice(0, 6))}
               />
-              {error && <p className="text-sm text-danger">{error}</p>}
               <Button type="submit" className="w-full" loading={loading}>
                 Verificar
               </Button>
@@ -226,14 +230,26 @@ export function LoginPage() {
                 value={confirma}
                 onChange={(e) => setConfirma(e.target.value)}
               />
-              {error && <p className="text-sm text-danger">{error}</p>}
               <Button type="submit" className="w-full" loading={loading}>
                 Salvar senha
               </Button>
             </form>
           )}
+          </div>
         </div>
       </section>
+    </div>
+  )
+}
+
+function AuthError({ message }: { message: string }) {
+  return (
+    <div
+      role="alert"
+      className="mb-4 flex items-start gap-3 rounded-2xl border border-danger bg-danger/10 px-3.5 py-3 text-sm text-danger"
+    >
+      <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden />
+      <p>{message}</p>
     </div>
   )
 }

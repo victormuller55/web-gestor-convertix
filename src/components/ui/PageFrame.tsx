@@ -26,15 +26,9 @@ export function DataTableShell({
   className?: string
 }) {
   return (
-    <div
-      className={cn(
-        'flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-line bg-card shadow-sm',
-        'max-md:rounded-none max-md:border-0 max-md:bg-transparent max-md:shadow-none',
-        className,
-      )}
-    >
+    <div className={cn('flex min-h-0 flex-1 flex-col overflow-hidden bg-card', className)}>
       {toolbar != null && (
-        <div className="shrink-0 border-b border-line px-4 py-3 max-md:mb-3 max-md:rounded-2xl max-md:border max-md:bg-card max-md:px-3">{toolbar}</div>
+        <div className="shrink-0 border-b border-line px-6 py-3">{toolbar}</div>
       )}
       <div className="min-h-0 flex-1 overflow-auto scrollbar-thin">{children}</div>
       {footer != null && <div className="shrink-0">{footer}</div>}

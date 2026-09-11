@@ -12,7 +12,7 @@ export function PageHeader({
   actions?: ReactNode
 }) {
   return (
-    <div className="mb-3 flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex shrink-0 flex-col gap-2 border-b border-line px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0">
         {eyebrow && (
           <p className="text-[11px] font-semibold tracking-[0.14em] text-muted uppercase">

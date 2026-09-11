@@ -17,6 +17,12 @@ export const TipoProdutoCobranca = {
 } as const
 export type TipoProdutoCobranca = (typeof TipoProdutoCobranca)[keyof typeof TipoProdutoCobranca]
 
+export const TipoProdutoDashboard = {
+  TODOS: 'TODOS',
+  ...TipoProdutoCobranca,
+} as const
+export type TipoProdutoDashboard = (typeof TipoProdutoDashboard)[keyof typeof TipoProdutoDashboard]
+
 export const StatusSite = {
   ATIVO: 'ATIVO',
   INATIVO: 'INATIVO',

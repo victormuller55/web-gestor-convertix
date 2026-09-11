@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { Menu } from 'lucide-react'
 import { Sidebar } from './Sidebar'
@@ -19,12 +19,32 @@ const titles: Record<string, string> = {
   '/perfil': 'Perfil',
 }
 
+const SIDEBAR_KEY = 'convertix.sidebar-collapsed'
+
 export function AppShell() {
   const [open, setOpen] = useState(false)
   const [drawerVisible, setDrawerVisible] = useState(false)
+  const [collapsed, setCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem(SIDEBAR_KEY) === '1'
+    } catch {
+      return false
+    }
+  })
+  const [peek, setPeek] = useState(false)
+  const leaveTimer = useRef<number>(0)
   const location = useLocation()
   const { user } = useAuth()
   const title = titles[location.pathname] ?? 'Convertix'
+  const rail = collapsed && !peek
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(SIDEBAR_KEY, collapsed ? '1' : '0')
+    } catch {
+      /* ignore */
+    }
+  }, [collapsed])
 
   function openDrawer() {
     setOpen(true)
@@ -38,10 +58,51 @@ export function AppShell() {
     window.setTimeout(() => setOpen(false), 260)
   }
 
+  function toggleCollapsed() {
+    window.clearTimeout(leaveTimer.current)
+    if (collapsed) {
+      setCollapsed(false)
+      setPeek(false)
+      return
+    }
+    setCollapsed(true)
+    setPeek(false)
+  }
+
+  function enterRail() {
+    if (!collapsed) return
+    window.clearTimeout(leaveTimer.current)
+    setPeek(true)
+  }
+
+  function leaveRail() {
+    if (!collapsed) return
+    window.clearTimeout(leaveTimer.current)
+    leaveTimer.current = window.setTimeout(() => setPeek(false), 180)
+  }
+
   return (
-    <div className="h-dvh overflow-hidden bg-paper lg:grid lg:grid-cols-[260px_1fr]">
-      <div className="hidden h-dvh lg:block">
-        <Sidebar />
+    <div className="flex h-dvh overflow-hidden bg-card">
+      <div className={cn('relative hidden h-dvh shrink-0 lg:block', collapsed ? 'w-20' : 'w-[260px]')}>
+        <div
+          className={cn(
+            'h-full transition-[width,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]',
+            collapsed && peek
+              ? 'absolute inset-y-0 left-0 z-30 w-[260px] shadow-2xl'
+              : 'w-full',
+          )}
+          onMouseEnter={enterRail}
+          onMouseLeave={leaveRail}
+        >
+          <Sidebar
+            collapsed={rail}
+            collapsible
+            onToggleCollapse={toggleCollapsed}
+            onNavigate={() => {
+              if (collapsed) setPeek(false)
+            }}
+          />
+        </div>
       </div>
 
       {open && (
@@ -61,7 +122,7 @@ export function AppShell() {
         </div>
       )}
 
-      <div className="flex h-dvh min-h-0 flex-col overflow-hidden">
+      <div className="flex h-dvh min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <header className="flex shrink-0 items-center justify-between border-b border-line bg-card/90 px-4 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] backdrop-blur md:px-6 md:pt-2">
           <div className="flex items-center gap-3">
             <button
@@ -81,7 +142,7 @@ export function AppShell() {
             {user?.tipo === 'ADMIN' ? 'Admin' : 'Cliente'}
           </span>
         </header>
-        <main className="flex min-h-0 flex-1 flex-col overflow-hidden px-4 py-4 md:px-6">
+        <main className="flex min-h-0 flex-1 flex-col overflow-hidden bg-card">
           <div key={location.pathname} className="page-enter flex h-full min-h-0 flex-col">
             <Outlet />
           </div>

@@ -252,14 +252,22 @@ export function SitesPage() {
                 setPage(0)
               }}
             />
-            <Select value={filtroTipo} onChange={(e) => setFiltroTipo(e.target.value)}>
-              <option value="">Todos os tipos</option>
+            <Select
+              label="Tipo"
+              value={filtroTipo}
+              onChange={(e) => setFiltroTipo(e.target.value)}
+            >
+              <option value="">Todos</option>
               {Object.entries(TIPO_SITE_LABEL).map(([k, v]) => (
                 <option key={k} value={k}>{v}</option>
               ))}
             </Select>
-            <Select value={filtroStatus} onChange={(e) => setFiltroStatus(e.target.value)}>
-              <option value="">Todos os status</option>
+            <Select
+              label="Status"
+              value={filtroStatus}
+              onChange={(e) => setFiltroStatus(e.target.value)}
+            >
+              <option value="">Todos</option>
               {Object.entries(STATUS_SITE_LABEL).map(([k, v]) => (
                 <option key={k} value={k}>{v}</option>
               ))}

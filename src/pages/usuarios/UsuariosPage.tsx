@@ -110,14 +110,15 @@ export function UsuariosPage() {
   const columns = useMemo<Column<Usuario>[]>(
     () => [
       {
+        key: 'foto',
+        header: 'Foto',
+        className: 'w-14',
+        render: (row) => <Avatar name={row.nome} src={row.foto} />,
+      },
+      {
         key: 'nome',
-        header: 'Usuário',
-        render: (row) => (
-          <div className="flex items-center gap-3">
-            <Avatar name={row.nome} src={row.foto} />
-            <p className="font-semibold">{row.nome}</p>
-          </div>
-        ),
+        header: 'Nome',
+        render: (row) => <p className="font-semibold">{row.nome}</p>,
       },
       { key: 'email', header: 'E-mail', render: (row) => row.email || '—' },
       { key: 'tipo', header: 'Tipo', render: (row) => TIPO_USUARIO_LABEL[row.tipo] },

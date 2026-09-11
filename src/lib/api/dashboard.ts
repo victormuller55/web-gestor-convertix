@@ -5,6 +5,7 @@ import { endpoints } from './endpoints'
 
 export function obterDashboardInicio(params?: {
   meses?: number
+  tipo_produto?: string
   limite_atividades?: number
   limite_alertas?: number
   limite_tops?: number

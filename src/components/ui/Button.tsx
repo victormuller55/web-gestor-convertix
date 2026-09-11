@@ -29,7 +29,8 @@ export function Button({
       type={type}
       disabled={isDisabled}
       className={cn(
-        'relative inline-flex items-center justify-center gap-2 rounded-xl font-semibold',
+        'ui-press relative inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-colors duration-200',
+        'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
         'disabled:cursor-not-allowed disabled:opacity-55',
         isGhost && isIconOnly
           ? 'size-11 p-0 md:size-9'
@@ -40,34 +41,19 @@ export function Button({
               !children && size === 'sm' && 'px-2',
               !children && size === 'md' && 'px-2.5',
             ),
-        isGhost
-          ? cn(
-              'ui-press transition-all duration-200 ease-out',
-              'hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97]',
-              'disabled:hover:translate-y-0 disabled:active:scale-100',
-              variant === 'ghost-danger' && 'text-danger hover:bg-danger-soft hover:text-danger',
-              variant === 'ghost' && !isIconOnly && 'text-muted hover:bg-ink/5 hover:text-ink',
-              variant === 'ghost' && isIconOnly && 'border border-line text-muted hover:bg-paper hover:text-ink',
-              variant === 'ghost-danger' && isIconOnly && 'border border-danger/40',
-            )
-          : cn(
-              'btn-3d',
-              size === 'lg' && 'btn-3d-lg',
-              size === 'sm' && 'btn-3d-sm',
-              variant === 'primary' && 'btn-3d-primary',
-              variant === 'secondary' && 'btn-3d-secondary',
-              variant === 'danger' && 'btn-3d-danger',
-              variant === 'soft' && 'btn-3d-soft',
-            ),
+        variant === 'primary' && 'bg-brand text-white hover:bg-brand-hover',
+        variant === 'secondary' && 'border border-line bg-card text-ink hover:bg-paper',
+        variant === 'danger' && 'bg-danger text-white hover:bg-danger/90',
+        variant === 'soft' && 'bg-brand-soft text-brand-ink hover:bg-brand/15',
+        variant === 'ghost' && !isIconOnly && 'text-muted hover:bg-ink/5 hover:text-ink',
+        variant === 'ghost' && isIconOnly && 'border border-line text-muted hover:bg-paper hover:text-ink',
+        variant === 'ghost-danger' && 'text-danger hover:bg-danger-soft hover:text-danger',
+        variant === 'ghost-danger' && isIconOnly && 'border border-danger/40',
         className,
       )}
       {...props}
     >
-      {loading ? (
-        <Spinner className={size === 'lg' ? 'size-5' : 'size-4'} />
-      ) : (
-        icon
-      )}
+      {loading ? <Spinner className={size === 'lg' ? 'size-5' : 'size-4'} /> : icon}
       {children}
     </button>
   )

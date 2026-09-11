@@ -121,8 +121,8 @@ export function PerfilPage() {
           }
         />
 
-        <div className="grid flex-1 items-start gap-4 lg:grid-cols-[minmax(16rem,20rem)_minmax(0,1fr)]">
-          <aside className="rounded-2xl border border-line bg-card p-5 lg:sticky lg:top-0">
+        <div className="grid flex-1 items-start lg:grid-cols-[minmax(16rem,20rem)_minmax(0,1fr)]">
+          <aside className="border-b border-line p-6 lg:sticky lg:top-0 lg:border-r lg:border-b-0">
             <PhotoPicker
               name={user.nome || user.nome_empresa || undefined}
               currentUrl={user.foto}
@@ -140,7 +140,7 @@ export function PerfilPage() {
             </div>
           </aside>
 
-          <div className="space-y-4">
+          <div>
             <Section
               icon={<UserRound className="size-4" />}
               title="Dados da conta"
@@ -237,7 +237,7 @@ function Section({
   children: ReactNode
 }) {
   return (
-    <section className="rounded-2xl border border-line bg-card p-5 md:p-6">
+    <section className="border-b border-line p-6">
       <div className="mb-5 flex items-start gap-3 border-b border-line pb-4">
         <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-paper text-brand">
           {icon}

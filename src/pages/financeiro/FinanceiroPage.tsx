@@ -50,7 +50,7 @@ export function FinanceiroPage() {
         }
       />
 
-      <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid sm:grid-cols-2 xl:grid-cols-4">
         <KpiCard label="Total pago" value={formatMoney(data.total_pago)} tone="brand" />
         <KpiCard label="Em aberto" value={formatMoney(data.total_pendente)} tone="warn" hint={`${data.quantidade_pendentes ?? 0} pendentes`} />
         <KpiCard label="Pagamentos" value={data.quantidade_pagamentos ?? 0} />
@@ -60,8 +60,8 @@ export function FinanceiroPage() {
         />
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[0.8fr_1.2fr]">
-        <section className="rounded-3xl border border-line bg-card p-5 shadow-sm">
+      <div className="grid xl:grid-cols-[0.8fr_1.2fr]">
+        <section className="border-t border-line p-6 xl:border-r">
           <h3 className="mb-3 font-display text-xl">Assinatura</h3>
           {data.assinatura_ativa ? (
             <div>
@@ -79,7 +79,7 @@ export function FinanceiroPage() {
           )}
         </section>
 
-        <section className="overflow-hidden rounded-3xl border border-line bg-card p-5 shadow-sm">
+        <section className="overflow-hidden border-t border-line p-6">
           <div className="mb-4 flex items-center justify-between">
             <h3 className="font-display text-xl">Últimos pagamentos</h3>
             <Button variant="ghost" onClick={() => navigate('/pagamentos')}>

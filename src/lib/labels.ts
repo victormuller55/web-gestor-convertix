@@ -8,6 +8,7 @@ import {
   StatusPagamento,
   StatusSite,
   TipoProdutoCobranca,
+  TipoProdutoDashboard,
   TipoSite,
   TipoUsuario,
 } from '@/types/enums'
@@ -28,6 +29,11 @@ export const TIPO_PRODUTO_COBRANCA_LABEL: Record<TipoProdutoCobranca, string> = 
   LANDING_PAGE: 'Landing page',
   SITE_COMERCIAL: 'Site institucional',
   APLICATIVO_MOBILE: 'Aplicativo mobile',
+}
+
+export const TIPO_PRODUTO_DASHBOARD_LABEL: Record<TipoProdutoDashboard, string> = {
+  TODOS: 'Todos os produtos',
+  ...TIPO_PRODUTO_COBRANCA_LABEL,
 }
 
 export const STATUS_SITE_LABEL: Record<StatusSite, string> = {

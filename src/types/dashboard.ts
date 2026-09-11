@@ -16,6 +16,7 @@ export interface ContagemChave {
 
 export interface ContagemValor {
   chave: string
+  label?: string
   quantidade: number
   valor?: number
 }
@@ -37,6 +38,76 @@ export interface PontoQuantidadeMensal {
   quantidade: number
 }
 
+export interface DashboardPagamento {
+  id: number
+  valor: number
+  descricao: string
+  status: StatusPagamento
+  forma_pagamento?: FormaPagamento
+  parcelas?: number
+  asaas_payment_id?: string
+  invoice_url?: string
+  comprovante_url?: string
+  created_at?: string
+  data_confirmacao?: string
+  cliente_id?: number
+  cliente_nome?: string
+  produto_nome?: string | null
+  produto_tipo?: string | null
+  produto_tipo_label?: string | null
+}
+
+export interface DashboardFinanceiro {
+  tipo_produto?: string
+  tipo_produto_label?: string
+  receita_mes_atual?: number
+  receita_mes_anterior?: number
+  variacao_receita_percentual?: number
+  total_pago?: number
+  total_pendente?: number
+  quantidade_pagamentos?: number
+  quantidade_pendentes?: number
+  quantidade_vencidos?: number
+  ticket_medio_pago?: number
+  mrr_estimado?: number
+  assinaturas_ativas?: number
+  receita_mensal?: PontoReceitaMensal[]
+  receita_por_produto?: ContagemValor[]
+  pagamentos_por_status?: ContagemValor[]
+  pagamentos_por_forma?: ContagemValor[]
+  ultimos_pagamentos?: DashboardPagamento[]
+}
+
+export interface DashboardProdutoRecente {
+  id: number
+  nome: string
+  status?: string
+  status_label?: string
+  cliente_id?: number
+  cliente_nome?: string
+  created_at?: string
+}
+
+export interface DashboardProdutoBloco {
+  chave: string
+  label: string
+  total: number
+  destaque: number
+  destaque_label?: string
+  assinaturas_ativas?: number
+  mrr_estimado?: number
+  por_status?: ContagemChave[]
+  novos_mensal?: PontoQuantidadeMensal[]
+  recentes?: DashboardProdutoRecente[]
+}
+
+export interface DashboardProdutos {
+  aplicativos?: DashboardProdutoBloco
+  biolinks?: DashboardProdutoBloco
+  landing_pages?: DashboardProdutoBloco
+  sites_institucionais?: DashboardProdutoBloco
+}
+
 export interface DashboardAlerta {
   id: string
   tipo?: string
@@ -55,6 +126,8 @@ export interface DashboardInicio {
   gerado_em?: string
   escopo?: 'ADMIN' | 'CLIENTE' | string
   periodo_meses?: number
+  tipo_produto?: string
+  tipo_produto_label?: string
   usuario?: {
     id: number
     nome: string
@@ -143,21 +216,7 @@ export interface DashboardInicio {
     cliente_id?: number
     cliente_nome?: string
   }
-  ultimos_pagamentos?: Array<{
-    id: number
-    valor: number
-    descricao: string
-    status: StatusPagamento
-    forma_pagamento?: FormaPagamento
-    parcelas?: number
-    asaas_payment_id?: string
-    invoice_url?: string
-    comprovante_url?: string
-    created_at?: string
-    data_confirmacao?: string
-    cliente_id?: number
-    cliente_nome?: string
-  }>
+  ultimos_pagamentos?: DashboardPagamento[]
   atividades_recentes?: Array<{
     id: string
     tipo?: string
@@ -169,4 +228,6 @@ export interface DashboardInicio {
     cliente_nome?: string
     created_at?: string
   }>
+  financeiro?: DashboardFinanceiro
+  produtos?: DashboardProdutos
 }

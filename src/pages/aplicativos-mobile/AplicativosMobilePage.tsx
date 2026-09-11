@@ -340,13 +340,14 @@ export function AplicativosMobilePage() {
             />
             {isAdmin && (
               <Select
+                label="Cliente"
                 value={filtroCliente}
                 onChange={(e) => {
                   setFiltroCliente(e.target.value)
                   setPage(0)
                 }}
               >
-                <option value="">Todos os clientes</option>
+                <option value="">Todos</option>
                 {(clientes.data?.content ?? []).map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.nome_empresa}
@@ -355,13 +356,14 @@ export function AplicativosMobilePage() {
               </Select>
             )}
             <Select
+              label="Status"
               value={filtroStatus}
               onChange={(e) => {
                 setFiltroStatus(e.target.value)
                 setPage(0)
               }}
             >
-              <option value="">Todos os status</option>
+              <option value="">Todos</option>
               {Object.entries(STATUS_APLICATIVO_MOBILE_LABEL).map(([k, v]) => (
                 <option key={k} value={k}>
                   {v}
