@@ -13,6 +13,6 @@ export function obterDashboardInicio(params?: {
   return getJson<DashboardInicio>(endpoints.dashboard.inicio + qs(params ?? {}))
 }
 
-export function obterFinanceiroDashboard() {
-  return getJson<FinanceiroDashboard>(endpoints.financeiro.dashboard)
+export function obterFinanceiroDashboard(params?: { ano?: number; mes?: number }) {
+  return getJson<FinanceiroDashboard>(endpoints.financeiro.dashboard + qs(params ?? {}))
 }

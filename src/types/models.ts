@@ -197,6 +197,20 @@ export interface Assinatura {
   cobrancas?: Pagamento[]
 }
 
+export interface AssinaturaAtivaDashboard {
+  id: number
+  descricao?: string | null
+  valor?: number | null
+  ciclo?: CicloAssinatura | null
+  ciclo_label?: string | null
+  forma_pagamento?: FormaPagamento | null
+  cliente_nome?: string | null
+  produto_nome?: string | null
+  proxima_cobranca?: string | null
+  situacao?: SituacaoAssinaturaSite | null
+  situacao_label?: string | null
+}
+
 export interface FinanceiroDashboard {
   total_pago?: number
   total_pendente?: number
@@ -209,6 +223,7 @@ export interface FinanceiroDashboard {
   metodo_pagamento_assinatura?: FormaPagamento | null
   descricao_assinatura?: string | null
   status_ultimo_pagamento?: StatusPagamento | null
+  assinaturas_ativas?: AssinaturaAtivaDashboard[]
 }
 
 export interface RecuperarSenhaResponse {

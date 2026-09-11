@@ -54,6 +54,12 @@ export function todayIso() {
   return toIsoDateFromLocal(new Date())
 }
 
+export function currentMonthValue(date = new Date()) {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  return `${y}-${m}`
+}
+
 export function startOfMonthIso(date = new Date()) {
   return toIsoDateFromLocal(new Date(date.getFullYear(), date.getMonth(), 1))
 }
