@@ -16,6 +16,7 @@ import { FORMA_PAGAMENTO_LABEL, STATUS_PAGAMENTO_LABEL, enumLabel } from '@/lib/
 import {
   FormaPagamento,
   StatusPagamento,
+  TipoProdutoCobranca,
   isPagamentoPago,
   podeCancelarPagamento,
   podeEstornarPagamento,
@@ -32,7 +33,7 @@ import { Modal } from '@/components/ui/Modal'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { PageSpinner } from '@/components/ui/Spinner'
-import { FormaBadge, StatusPagamentoBadge } from '@/components/status/badges'
+import { FormaBadge, StatusPagamentoBadge, TipoProdutoCobrancaBadge } from '@/components/status/badges'
 import { DataTableShell, PageFill } from '@/components/ui/PageFrame'
 
 function qrSrc(qr?: string | null) {
@@ -186,9 +187,14 @@ export function PagamentosPage() {
   const columns = useMemo<Column<Pagamento>[]>(
     () => [
       {
-        key: 'desc',
-        header: 'Cobrança',
-        render: (row) => <p className="font-semibold">{row.descricao}</p>,
+        key: 'produto',
+        header: 'Site / App',
+        render: (row) => <p className="font-semibold">{nomeProdutoCobranca(row)}</p>,
+      },
+      {
+        key: 'tipo',
+        header: 'Tipo',
+        render: (row) => <TipoProdutoCobrancaBadge tipo={tipoProdutoCobranca(row)} />,
       },
       {
         key: 'cliente',
@@ -451,7 +457,11 @@ export function PagamentosPage() {
             <Info label="Status" value={<StatusPagamentoBadge status={pagamento.status} />} />
             <Info label="Forma" value={enumLabel(FORMA_PAGAMENTO_LABEL, pagamento.forma_pagamento)} />
             <Info label="Cliente" value={pagamento.cliente_nome_empresa || '—'} />
-            <Info label="Site" value={pagamento.site_nome || '—'} />
+            <Info label="Site / App" value={nomeProdutoCobranca(pagamento)} />
+            <Info
+              label="Tipo"
+              value={<TipoProdutoCobrancaBadge tipo={tipoProdutoCobranca(pagamento)} />}
+            />
             <Info label="Vencimento" value={formatDate(pagamento.data_vencimento)} />
             <Info label="Confirmado em" value={formatDateTime(pagamento.data_confirmacao)} />
             <Info label="Criado em" value={formatDateTime(pagamento.created_at)} />
@@ -545,6 +555,17 @@ export function PagamentosPage() {
       />
     </PageFill>
   )
+}
+
+function nomeProdutoCobranca(pagamento: Pagamento) {
+  return pagamento.produto_nome || pagamento.site_nome || pagamento.aplicativo_mobile_nome || '—'
+}
+
+function tipoProdutoCobranca(pagamento: Pagamento) {
+  if (pagamento.produto_tipo) return pagamento.produto_tipo
+  if (pagamento.site_tipo) return pagamento.site_tipo
+  if (pagamento.aplicativo_mobile_id) return TipoProdutoCobranca.APLICATIVO_MOBILE
+  return null
 }
 
 function Info({ label, value }: { label: string; value: ReactNode }) {

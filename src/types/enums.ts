@@ -11,6 +11,12 @@ export const TipoSite = {
 } as const
 export type TipoSite = (typeof TipoSite)[keyof typeof TipoSite]
 
+export const TipoProdutoCobranca = {
+  ...TipoSite,
+  APLICATIVO_MOBILE: 'APLICATIVO_MOBILE',
+} as const
+export type TipoProdutoCobranca = (typeof TipoProdutoCobranca)[keyof typeof TipoProdutoCobranca]
+
 export const StatusSite = {
   ATIVO: 'ATIVO',
   INATIVO: 'INATIVO',

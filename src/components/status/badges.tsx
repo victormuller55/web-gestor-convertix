@@ -7,6 +7,7 @@ import {
   STATUS_ASSINATURA_LABEL,
   STATUS_PAGAMENTO_LABEL,
   STATUS_SITE_LABEL,
+  TIPO_PRODUTO_COBRANCA_LABEL,
   TIPO_SITE_LABEL,
   enumLabel,
 } from '@/lib/labels'
@@ -18,6 +19,7 @@ import type {
   StatusAssinatura,
   StatusPagamento,
   StatusSite,
+  TipoProdutoCobranca,
   TipoSite,
 } from '@/types/enums'
 
@@ -65,6 +67,10 @@ export function SituacaoBadge({ status }: { status?: SituacaoAssinaturaSite | nu
 
 export function TipoSiteBadge({ tipo }: { tipo?: TipoSite | null }) {
   return <Badge tone="info">{enumLabel(TIPO_SITE_LABEL, tipo)}</Badge>
+}
+
+export function TipoProdutoCobrancaBadge({ tipo }: { tipo?: TipoProdutoCobranca | null }) {
+  return <Badge tone="info">{enumLabel(TIPO_PRODUTO_COBRANCA_LABEL, tipo)}</Badge>
 }
 
 export function FormaBadge({ forma }: { forma?: FormaPagamento | null }) {

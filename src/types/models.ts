@@ -6,6 +6,7 @@ import type {
   StatusAssinatura,
   StatusPagamento,
   StatusSite,
+  TipoProdutoCobranca,
   TipoSite,
   TipoUsuario,
   BioLinkItemIcone,
@@ -135,6 +136,10 @@ export interface Pagamento {
   site_id?: number | null
   site_nome?: string | null
   site_tipo?: TipoSite | null
+  aplicativo_mobile_id?: number | null
+  aplicativo_mobile_nome?: string | null
+  produto_nome?: string | null
+  produto_tipo?: TipoProdutoCobranca | null
   assinatura_id?: number | null
   asaas_payment_id?: string | null
   valor: number

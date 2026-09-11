@@ -7,6 +7,7 @@ import {
   StatusAssinatura,
   StatusPagamento,
   StatusSite,
+  TipoProdutoCobranca,
   TipoSite,
   TipoUsuario,
 } from '@/types/enums'
@@ -20,6 +21,13 @@ export const TIPO_SITE_LABEL: Record<TipoSite, string> = {
   BIOLINK: 'BioLink',
   LANDING_PAGE: 'Landing Page',
   SITE_COMERCIAL: 'Site comercial',
+}
+
+export const TIPO_PRODUTO_COBRANCA_LABEL: Record<TipoProdutoCobranca, string> = {
+  BIOLINK: 'BioLink',
+  LANDING_PAGE: 'Landing page',
+  SITE_COMERCIAL: 'Site institucional',
+  APLICATIVO_MOBILE: 'Aplicativo mobile',
 }
 
 export const STATUS_SITE_LABEL: Record<StatusSite, string> = {
