@@ -4,7 +4,7 @@ import { getJson, postJson, qs } from './client'
 import { endpoints } from './endpoints'
 
 export function listarPagamentos(params: {
-  status?: StatusPagamento
+  status?: StatusPagamento | StatusPagamento[]
   forma_pagamento?: FormaPagamento
   data_inicio?: string
   data_fim?: string

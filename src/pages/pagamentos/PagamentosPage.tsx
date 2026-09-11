@@ -11,7 +11,7 @@ import {
 } from '@/lib/api/pagamentos'
 import { listarClientes } from '@/lib/api/clientes'
 import { ApiError } from '@/lib/api/client'
-import { formatDate, formatDateTime, formatMoney, parseCurrency, todayIso } from '@/lib/format'
+import { formatDate, formatDateTime, formatMoney, parseCurrency, startOfMonthIso, endOfMonthIso, todayIso } from '@/lib/format'
 import { FORMA_PAGAMENTO_LABEL, STATUS_PAGAMENTO_LABEL, enumLabel } from '@/lib/labels'
 import {
   FormaPagamento,
@@ -42,16 +42,25 @@ function qrSrc(qr?: string | null) {
   return `data:image/png;base64,${qr.includes(',') ? qr.split(',').pop() : qr}`
 }
 
+const FILTRO_STATUS_ABERTO = 'ABERTO'
+const STATUS_EM_ABERTO: StatusPagamento[] = [StatusPagamento.PENDING, StatusPagamento.OVERDUE]
+
+function statusesDoFiltro(filtro: string): StatusPagamento[] | undefined {
+  if (!filtro) return undefined
+  if (filtro === FILTRO_STATUS_ABERTO) return STATUS_EM_ABERTO
+  return [filtro as StatusPagamento]
+}
+
 export function PagamentosPage() {
   const { isAdmin } = useAuth()
   const { push } = useToast()
   const queryClient = useQueryClient()
 
   const [page, setPage] = useState(0)
-  const [status, setStatus] = useState('')
+  const [status, setStatus] = useState(FILTRO_STATUS_ABERTO)
   const [forma, setForma] = useState('')
-  const [dataInicio, setDataInicio] = useState('')
-  const [dataFim, setDataFim] = useState('')
+  const [dataInicio, setDataInicio] = useState(() => startOfMonthIso())
+  const [dataFim, setDataFim] = useState(() => endOfMonthIso())
 
   const [novoOpen, setNovoOpen] = useState(false)
   const [detalheId, setDetalheId] = useState<number | null>(null)
@@ -72,7 +81,7 @@ export function PagamentosPage() {
     queryKey: ['pagamentos', status, forma, dataInicio, dataFim, page],
     queryFn: () =>
       listarPagamentos({
-        status: (status || undefined) as StatusPagamento | undefined,
+        status: statusesDoFiltro(status),
         forma_pagamento: (forma || undefined) as FormaPagamento | undefined,
         data_inicio: dataInicio || undefined,
         data_fim: dataFim || undefined,
@@ -273,6 +282,7 @@ export function PagamentosPage() {
                 setPage(0)
               }}
             >
+              <option value={FILTRO_STATUS_ABERTO}>Pendentes e vencidos</option>
               <option value="">Todos</option>
               {Object.entries(STATUS_PAGAMENTO_LABEL).map(([value, label]) => (
                 <option key={value} value={value}>
@@ -296,7 +306,7 @@ export function PagamentosPage() {
               ))}
             </Select>
             <Input
-              label="De"
+              label="Vence de"
               type="date"
               value={dataInicio}
               onChange={(e) => {
@@ -305,7 +315,7 @@ export function PagamentosPage() {
               }}
             />
             <Input
-              label="Até"
+              label="Vence até"
               type="date"
               value={dataFim}
               onChange={(e) => {

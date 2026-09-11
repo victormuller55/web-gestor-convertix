@@ -121,10 +121,19 @@ export function postMultipartField<T>(url: string, field: string, file: File) {
   return request<T>(url, { method: 'POST', body: form }, false)
 }
 
-export function qs(params: Record<string, string | number | boolean | undefined | null>) {
+export function qs(
+  params: Record<string, string | number | boolean | Array<string | number> | undefined | null>,
+) {
   const search = new URLSearchParams()
   Object.entries(params).forEach(([key, value]) => {
     if (value === undefined || value === null || value === '') return
+    if (Array.isArray(value)) {
+      value.forEach((item) => {
+        if (item === undefined || item === null || item === '') return
+        search.append(key, String(item))
+      })
+      return
+    }
     search.set(key, String(value))
   })
   const query = search.toString()

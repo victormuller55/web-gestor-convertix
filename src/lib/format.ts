@@ -51,7 +51,22 @@ export function toIsoDate(value: string) {
 }
 
 export function todayIso() {
-  return toIsoDate(new Date().toISOString())
+  return toIsoDateFromLocal(new Date())
+}
+
+export function startOfMonthIso(date = new Date()) {
+  return toIsoDateFromLocal(new Date(date.getFullYear(), date.getMonth(), 1))
+}
+
+export function endOfMonthIso(date = new Date()) {
+  return toIsoDateFromLocal(new Date(date.getFullYear(), date.getMonth() + 1, 0))
+}
+
+function toIsoDateFromLocal(date: Date) {
+  const y = date.getFullYear()
+  const m = String(date.getMonth() + 1).padStart(2, '0')
+  const d = String(date.getDate()).padStart(2, '0')
+  return `${y}-${m}-${d}`
 }
 
 export function plusDaysIso(days: number) {
