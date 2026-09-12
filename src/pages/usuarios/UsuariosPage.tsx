@@ -5,14 +5,15 @@ import { alterarUsuario, apagarUsuario, criarUsuario, listarUsuarios } from '@/l
 import { ApiError } from '@/lib/api/client'
 import { useDebouncedValue } from '@/hooks/useDebouncedValue'
 import { formatDateTime } from '@/lib/format'
-import { TIPO_USUARIO_LABEL } from '@/lib/labels'
+import { TIPO_USUARIO_LABEL, enumLabel } from '@/lib/labels'
+import { TipoUsuario } from '@/types/enums'
 import { isValidEmail, isValidPassword } from '@/lib/validators'
 import { useToast } from '@/context/ToastContext'
 import type { Usuario } from '@/types/models'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { SearchInput } from '@/components/ui/Select'
+import { SearchInput, Select } from '@/components/ui/Select'
 import { Switch } from '@/components/ui/Switch'
 import { Table, type Column } from '@/components/ui/Table'
 import { Pagination } from '@/components/ui/Pagination'
@@ -39,6 +40,8 @@ export function UsuariosPage() {
   const { push } = useToast()
   const queryClient = useQueryClient()
   const [query, setQuery] = useState('')
+  const [tipo, setTipo] = useState<string>(TipoUsuario.ADMIN)
+  const [ativo, setAtivo] = useState('true')
   const [page, setPage] = useState(0)
   const search = useDebouncedValue(query)
   const [editing, setEditing] = useState<Usuario | null>(null)
@@ -48,8 +51,15 @@ export function UsuariosPage() {
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const list = useQuery({
-    queryKey: ['usuarios', search, page],
-    queryFn: () => listarUsuarios({ query: search, page, size: 30 }),
+    queryKey: ['usuarios', search, tipo, ativo, page],
+    queryFn: () =>
+      listarUsuarios({
+        query: search,
+        tipo: tipo || undefined,
+        ativo: ativo === '' ? undefined : ativo === 'true',
+        page,
+        size: 30,
+      }),
   })
 
   const save = useMutation({
@@ -121,7 +131,7 @@ export function UsuariosPage() {
         render: (row) => <p className="font-semibold">{row.nome}</p>,
       },
       { key: 'email', header: 'E-mail', render: (row) => row.email || '—' },
-      { key: 'tipo', header: 'Tipo', render: (row) => TIPO_USUARIO_LABEL[row.tipo] },
+      { key: 'tipo', header: 'Tipo', render: (row) => enumLabel(TIPO_USUARIO_LABEL, row.tipo) },
       {
         key: 'ativo',
         header: 'Status',
@@ -172,14 +182,43 @@ export function UsuariosPage() {
 
       <DataTableShell
         toolbar={
-          <SearchInput
-            placeholder="Buscar por nome ou e-mail"
-            value={query}
-            onChange={(next) => {
-              setQuery(next)
-              setPage(0)
-            }}
-          />
+          <div className="grid gap-2 md:grid-cols-[1fr_12rem_10rem]">
+            <SearchInput
+              placeholder="Buscar por nome ou e-mail"
+              value={query}
+              onChange={(next) => {
+                setQuery(next)
+                setPage(0)
+              }}
+            />
+            <Select
+              label="Tipo"
+              value={tipo}
+              onChange={(e) => {
+                setTipo(e.target.value)
+                setPage(0)
+              }}
+            >
+              <option value="">Todos</option>
+              {Object.entries(TIPO_USUARIO_LABEL).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </Select>
+            <Select
+              label="Status"
+              value={ativo}
+              onChange={(e) => {
+                setAtivo(e.target.value)
+                setPage(0)
+              }}
+            >
+              <option value="true">Ativos</option>
+              <option value="false">Inativos</option>
+              <option value="">Todos</option>
+            </Select>
+          </div>
         }
         footer={
           <Pagination

@@ -7,6 +7,7 @@ export function listarUsuarios(params: {
   page?: number
   size?: number
   ativo?: boolean
+  tipo?: string
   id?: number
 }) {
   return getJson<PageResponse<Usuario>>(endpoints.usuarios.list + qs(params))
