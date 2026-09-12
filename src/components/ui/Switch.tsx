@@ -4,12 +4,16 @@ export function Switch({
   checked,
   onChange,
   label,
+  description,
   size = 'md',
+  className,
 }: {
   checked: boolean
   onChange: (value: boolean) => void
   label?: string
+  description?: string
   size?: 'md' | 'lg'
+  className?: string
 }) {
   const large = size === 'lg'
   return (
@@ -19,12 +23,18 @@ export function Switch({
       aria-checked={checked}
       aria-label={label || (checked ? 'Desativar' : 'Ativar')}
       onClick={() => onChange(!checked)}
-      className="ui-press flex items-center gap-3 text-sm font-medium text-ink"
+      className={cn(
+        'ui-press flex items-center gap-3 text-left text-sm font-medium text-ink',
+        'outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand',
+        description && 'items-start',
+        className,
+      )}
     >
       <span
         className={cn(
-          'relative rounded-full transition-colors duration-300 ease-out',
+          'relative shrink-0 rounded-full transition-colors duration-300 ease-out',
           large ? 'h-8 w-14' : 'h-7 w-12',
+          description && 'mt-0.5',
           checked ? 'bg-brand' : 'bg-line',
         )}
       >
@@ -36,7 +46,14 @@ export function Switch({
           )}
         />
       </span>
-      {label}
+      {label ? (
+        <span className="min-w-0">
+          <span className="block">{label}</span>
+          {description ? (
+            <span className="mt-0.5 block text-xs font-normal leading-relaxed text-muted">{description}</span>
+          ) : null}
+        </span>
+      ) : null}
     </button>
   )
 }

@@ -311,7 +311,8 @@ export function SitesPage() {
           </Select>
           <Input label="Nome" value={form.nome} error={errors.nome} onChange={(e) => setForm((f) => ({ ...f, nome: e.target.value }))} />
           <Select label="Tipo" value={form.tipo} onChange={(e) => setForm((f) => ({ ...f, tipo: e.target.value as TipoSite }))}>
-            {Object.entries(TIPO_SITE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+            <option value={TipoSite.BIOLINK}>{TIPO_SITE_LABEL.BIOLINK}</option>
+            <option value={TipoSite.LANDING_PAGE}>{TIPO_SITE_LABEL.LANDING_PAGE}</option>
           </Select>
           <Select label="Status" value={form.status} onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as StatusSite }))}>
             {Object.entries(STATUS_SITE_LABEL).map(([k, v]) => <option key={k} value={k}>{v}</option>)}

@@ -11,6 +11,11 @@ import {
   TipoProdutoDashboard,
   TipoSite,
   TipoUsuario,
+  TipoProjeto,
+  EtapaProjeto,
+  VinculoPlano,
+  TipoLandingPageCampo,
+  StatusLandingPageLead,
 } from '@/types/enums'
 
 export const TIPO_USUARIO_LABEL: Record<TipoUsuario, string> = {
@@ -34,6 +39,46 @@ export const TIPO_PRODUTO_COBRANCA_LABEL: Record<TipoProdutoCobranca, string> = 
 export const TIPO_PRODUTO_DASHBOARD_LABEL: Record<TipoProdutoDashboard, string> = {
   TODOS: 'Todos os produtos',
   ...TIPO_PRODUTO_COBRANCA_LABEL,
+}
+
+export const TIPO_PROJETO_LABEL: Record<TipoProjeto, string> = {
+  ...TIPO_PRODUTO_COBRANCA_LABEL,
+  OUTRO: 'Outro',
+}
+
+export const ETAPA_PROJETO_LABEL: Record<EtapaProjeto, string> = {
+  BRIEFING: 'Briefing',
+  EM_ANDAMENTO: 'Em andamento',
+  HOMOLOGACAO: 'Homologação',
+  CONCLUIDO: 'Concluído',
+  PAUSADO: 'Pausado',
+  CANCELADO: 'Cancelado',
+}
+
+export const VINCULO_PLANO_LABEL: Record<VinculoPlano, string> = {
+  SITE: 'Site',
+  APLICATIVO: 'Aplicativo',
+  NENHUM: 'Nenhum',
+}
+
+export const TIPO_LANDING_PAGE_CAMPO_LABEL: Record<TipoLandingPageCampo, string> = {
+  TEXT: 'Texto',
+  EMAIL: 'E-mail',
+  PHONE: 'Telefone',
+  NUMBER: 'Número',
+  TEXTAREA: 'Texto longo',
+  SELECT: 'Lista',
+  CHECKBOX: 'Caixa',
+  RADIO: 'Opção',
+  DATE: 'Data',
+}
+
+export const STATUS_LANDING_PAGE_LEAD_LABEL: Record<StatusLandingPageLead, string> = {
+  NOVO: 'Novo',
+  EM_ATENDIMENTO: 'Em atendimento',
+  NEGOCIANDO: 'Negociando',
+  CONVERTIDO: 'Convertido',
+  PERDIDO: 'Perdido',
 }
 
 export const STATUS_SITE_LABEL: Record<StatusSite, string> = {

@@ -11,11 +11,15 @@ const titles: Record<string, string> = {
   '/clientes': 'Clientes',
   '/sites': 'Sites',
   '/aplicativos-mobile': 'Aplicativos Mobile',
+  '/projetos': 'Projetos',
   '/biolinks': 'BioLinks',
   '/biolink': 'BioLink',
   '/financeiro': 'Financeiro',
   '/pagamentos': 'Pagamentos',
   '/assinaturas': 'Assinaturas',
+  '/planos': 'Planos',
+  '/landing-pages': 'Landing Pages',
+  '/leads': 'Leads',
   '/perfil': 'Perfil',
 }
 

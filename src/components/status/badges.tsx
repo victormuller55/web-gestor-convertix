@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/Badge'
 import {
   CICLO_LABEL,
+  ETAPA_PROJETO_LABEL,
   FORMA_PAGAMENTO_LABEL,
   SITUACAO_ASSINATURA_LABEL,
   STATUS_APLICATIVO_MOBILE_LABEL,
@@ -8,11 +9,15 @@ import {
   STATUS_PAGAMENTO_LABEL,
   STATUS_SITE_LABEL,
   TIPO_PRODUTO_COBRANCA_LABEL,
+  TIPO_PROJETO_LABEL,
   TIPO_SITE_LABEL,
+  VINCULO_PLANO_LABEL,
+  STATUS_LANDING_PAGE_LEAD_LABEL,
   enumLabel,
 } from '@/lib/labels'
 import type {
   CicloAssinatura,
+  EtapaProjeto,
   FormaPagamento,
   SituacaoAssinaturaSite,
   StatusAplicativoMobile,
@@ -20,7 +25,10 @@ import type {
   StatusPagamento,
   StatusSite,
   TipoProdutoCobranca,
+  TipoProjeto,
   TipoSite,
+  VinculoPlano,
+  StatusLandingPageLead,
 } from '@/types/enums'
 
 export function StatusPagamentoBadge({ status }: { status?: StatusPagamento | null }) {
@@ -71,6 +79,44 @@ export function TipoSiteBadge({ tipo }: { tipo?: TipoSite | null }) {
 
 export function TipoProdutoCobrancaBadge({ tipo }: { tipo?: TipoProdutoCobranca | null }) {
   return <Badge tone="info">{enumLabel(TIPO_PRODUTO_COBRANCA_LABEL, tipo)}</Badge>
+}
+
+export function TipoProjetoBadge({ tipo }: { tipo?: TipoProjeto | null }) {
+  return <Badge tone="info">{enumLabel(TIPO_PROJETO_LABEL, tipo)}</Badge>
+}
+
+export function EtapaProjetoBadge({ etapa }: { etapa?: EtapaProjeto | null }) {
+  const tone =
+    etapa === 'CONCLUIDO'
+      ? 'success'
+      : etapa === 'EM_ANDAMENTO'
+        ? 'brand'
+        : etapa === 'HOMOLOGACAO'
+          ? 'info'
+          : etapa === 'CANCELADO'
+            ? 'danger'
+            : etapa === 'PAUSADO'
+              ? 'neutral'
+              : 'warn'
+  return <Badge tone={tone}>{enumLabel(ETAPA_PROJETO_LABEL, etapa)}</Badge>
+}
+
+export function VinculoPlanoBadge({ vinculo }: { vinculo?: VinculoPlano | null }) {
+  return <Badge tone="neutral">{enumLabel(VINCULO_PLANO_LABEL, vinculo)}</Badge>
+}
+
+export function StatusLandingPageLeadBadge({ status }: { status?: StatusLandingPageLead | null }) {
+  const tone =
+    status === 'CONVERTIDO'
+      ? 'success'
+      : status === 'PERDIDO'
+        ? 'danger'
+        : status === 'NEGOCIANDO'
+          ? 'info'
+          : status === 'EM_ATENDIMENTO'
+            ? 'brand'
+            : 'warn'
+  return <Badge tone={tone}>{enumLabel(STATUS_LANDING_PAGE_LEAD_LABEL, status)}</Badge>
 }
 
 export function FormaBadge({ forma }: { forma?: FormaPagamento | null }) {

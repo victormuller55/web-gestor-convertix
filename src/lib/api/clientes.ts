@@ -27,6 +27,7 @@ export function alterarCliente(
     email: string
     senha?: string
     telefone?: string
+    remover_foto?: boolean
   },
   foto?: File | null,
 ) {

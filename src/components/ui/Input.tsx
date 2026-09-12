@@ -2,6 +2,7 @@ import { useState, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAt
 import { Eye, EyeOff } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { maskCurrency } from '@/lib/format'
+import { DatePicker } from './DatePicker'
 import { FloatLabel, hasFieldValue, isAlwaysFloatedType } from './FloatLabel'
 
 interface FieldProps {
@@ -60,6 +61,47 @@ function PasswordToggle({ visible, onToggle }: { visible: boolean; onToggle: () 
 }
 
 export function Input({
+  label,
+  error,
+  hint,
+  className,
+  onFocus,
+  onBlur,
+  placeholder,
+  type,
+  ...props
+}: InputHTMLAttributes<HTMLInputElement> & FieldProps) {
+  if (type === 'date' || type === 'month') {
+    return (
+      <DatePicker
+        {...props}
+        mode={type === 'month' ? 'month' : 'date'}
+        label={label}
+        error={error}
+        hint={hint}
+        className={className}
+        onFocus={onFocus}
+        onBlur={onBlur}
+      />
+    )
+  }
+
+  return (
+    <TextInput
+      {...props}
+      label={label}
+      error={error}
+      hint={hint}
+      className={className}
+      onFocus={onFocus}
+      onBlur={onBlur}
+      placeholder={placeholder}
+      type={type}
+    />
+  )
+}
+
+function TextInput({
   label,
   error,
   hint,

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 import { Pencil, Plus, Trash2 } from 'lucide-react'
 import { alterarUsuario, apagarUsuario, criarUsuario, listarUsuarios } from '@/lib/api/usuarios'
 import { ApiError } from '@/lib/api/client'
@@ -37,6 +38,7 @@ interface FormState {
 const emptyForm: FormState = { nome: '', email: '', senha: '', ativo: true, foto: null }
 
 export function UsuariosPage() {
+  const navigate = useNavigate()
   const { push } = useToast()
   const queryClient = useQueryClient()
   const [query, setQuery] = useState('')
@@ -62,8 +64,13 @@ export function UsuariosPage() {
       }),
   })
 
+  const editandoCliente = editing?.tipo === TipoUsuario.CLIENTE
+
   const save = useMutation({
     mutationFn: async () => {
+      if (editing?.tipo === TipoUsuario.CLIENTE) {
+        throw new Error('Usuários cliente devem ter os dados alterados na tela de Clientes.')
+      }
       if (editing) {
         return alterarUsuario(
           editing.id,
@@ -246,34 +253,50 @@ export function UsuariosPage() {
         title={editing ? 'Editar usuário' : 'Novo usuário'}
         onClose={() => setOpen(false)}
         footer={
-          <div className="flex justify-end gap-2">
-            <Button variant="secondary" onClick={() => setOpen(false)}>
-              Cancelar
-            </Button>
-            <Button
-              loading={save.isPending}
-              onClick={() => {
-                if (validate()) save.mutate()
-              }}
-            >
-              Salvar
-            </Button>
-          </div>
+          editandoCliente ? (
+            <div className="flex justify-end gap-2">
+              <Button variant="secondary" onClick={() => setOpen(false)}>
+                Fechar
+              </Button>
+              <Button onClick={() => navigate('/clientes')}>Ir para clientes</Button>
+            </div>
+          ) : (
+            <div className="flex justify-end gap-2">
+              <Button variant="secondary" onClick={() => setOpen(false)}>
+                Cancelar
+              </Button>
+              <Button
+                loading={save.isPending}
+                onClick={() => {
+                  if (validate()) save.mutate()
+                }}
+              >
+                Salvar
+              </Button>
+            </div>
+          )
         }
       >
-        <div className="space-y-4">
-          <PhotoPicker name={form.nome} currentUrl={editing?.foto} file={form.foto} onChange={(foto) => setForm((f) => ({ ...f, foto }))} />
-          <Input label="Nome" value={form.nome} error={errors.nome} onChange={(e) => setForm((f) => ({ ...f, nome: e.target.value }))} />
-          <Input label="E-mail" type="email" value={form.email} error={errors.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} />
-          <Input
-            label={editing ? 'Nova senha (opcional)' : 'Senha'}
-            type="password"
-            value={form.senha}
-            error={errors.senha}
-            onChange={(e) => setForm((f) => ({ ...f, senha: e.target.value }))}
+        {editandoCliente ? (
+          <EmptyState
+            title="Alteração indisponível aqui"
+            description="Usuários do tipo cliente devem ter os dados alterados na tela de Clientes."
           />
-          <Switch checked={form.ativo} onChange={(ativo) => setForm((f) => ({ ...f, ativo }))} label="Usuário ativo" />
-        </div>
+        ) : (
+          <div className="space-y-4">
+            <PhotoPicker name={form.nome} currentUrl={editing?.foto} file={form.foto} onChange={(foto) => setForm((f) => ({ ...f, foto }))} />
+            <Input label="Nome" value={form.nome} error={errors.nome} onChange={(e) => setForm((f) => ({ ...f, nome: e.target.value }))} />
+            <Input label="E-mail" type="email" value={form.email} error={errors.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} />
+            <Input
+              label={editing ? 'Nova senha (opcional)' : 'Senha'}
+              type="password"
+              value={form.senha}
+              error={errors.senha}
+              onChange={(e) => setForm((f) => ({ ...f, senha: e.target.value }))}
+            />
+            <Switch checked={form.ativo} onChange={(ativo) => setForm((f) => ({ ...f, ativo }))} label="Usuário ativo" />
+          </div>
+        )}
       </Modal>
 
       <ConfirmDialog

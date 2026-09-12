@@ -14,8 +14,12 @@ import {
   Sun,
   Users,
   Building2,
+  FolderKanban,
   Globe,
+  LayoutPanelLeft,
   Smartphone,
+  Tags,
+  UserRound,
 } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useTheme } from '@/context/ThemeContext'
@@ -41,15 +45,29 @@ const adminProdutosNav: NavEntry[] = [
   { to: '/sites', label: 'Sites', icon: Globe },
   { to: '/aplicativos-mobile', label: 'Aplicativos Mobile', icon: Smartphone },
   { to: '/biolinks', label: 'BioLinks', icon: Link2 },
+  { to: '/landing-pages', label: 'Landing Pages', icon: LayoutPanelLeft },
 ]
 
 const clienteProdutosNav: NavEntry[] = [
   { to: '/biolink', label: 'BioLink', icon: Link2 },
   { to: '/aplicativos-mobile', label: 'Aplicativos Mobile', icon: Smartphone },
+  { to: '/landing-pages', label: 'Landing Pages', icon: LayoutPanelLeft },
+]
+
+const operacaoNav: NavEntry[] = [
+  { to: '/projetos', label: 'Projetos', icon: FolderKanban },
+  { to: '/leads', label: 'Leads', icon: UserRound },
 ]
 
 const financeNav: NavEntry[] = [
   { to: '/financeiro', label: 'Visão geral', icon: Landmark },
+  { to: '/pagamentos', label: 'Pagamentos', icon: Receipt },
+  { to: '/assinaturas', label: 'Assinaturas', icon: RefreshCw },
+]
+
+const financeAdminNav: NavEntry[] = [
+  { to: '/financeiro', label: 'Visão geral', icon: Landmark },
+  { to: '/planos', label: 'Planos', icon: Tags },
   { to: '/pagamentos', label: 'Pagamentos', icon: Receipt },
   { to: '/assinaturas', label: 'Assinaturas', icon: RefreshCw },
 ]
@@ -184,8 +202,15 @@ export function Sidebar({
           collapsed={collapsed}
         />
         <NavSection
+          title="Operação"
+          items={operacaoNav}
+          pathname={location.pathname}
+          onNavigate={onNavigate}
+          collapsed={collapsed}
+        />
+        <NavSection
           title="Financeiro"
-          items={financeNav}
+          items={isAdmin ? financeAdminNav : financeNav}
           pathname={location.pathname}
           onNavigate={onNavigate}
           collapsed={collapsed}

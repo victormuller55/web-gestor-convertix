@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Eye, Plus } from 'lucide-react'
 import {
@@ -7,18 +7,14 @@ import {
   listarAssinaturas,
   obterAssinatura,
 } from '@/lib/api/assinaturas'
+import { listarPlanos } from '@/lib/api/planos'
 import { listarClientes } from '@/lib/api/clientes'
 import { listarSites } from '@/lib/api/sites'
 import { listarAplicativosMobile } from '@/lib/api/aplicativosMobile'
 import { ApiError } from '@/lib/api/client'
 import { formatCurrencyInput, formatDate, formatDateTime, formatMoney, parseCurrency, plusDaysIso } from '@/lib/format'
 import { CICLO_LABEL, STATUS_ASSINATURA_LABEL, TIPO_SITE_LABEL, enumLabel } from '@/lib/labels'
-import {
-  CicloAssinatura,
-  PLANOS_ASSINATURA,
-  StatusAssinatura,
-  TipoSite,
-} from '@/types/enums'
+import { CicloAssinatura, StatusAssinatura, TipoSite, VinculoPlano } from '@/types/enums'
 import type { AplicativoMobile, Assinatura, Site } from '@/types/models'
 import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/context/ToastContext'
@@ -35,8 +31,6 @@ import { CicloBadge, StatusAssinaturaBadge, StatusPagamentoBadge } from '@/compo
 import { cn } from '@/lib/cn'
 import { DataTableShell, PageFill } from '@/components/ui/PageFrame'
 
-type PlanoId = (typeof PLANOS_ASSINATURA)[number]['id']
-
 export function AssinaturasPage() {
   const { isAdmin } = useAuth()
   const { push } = useToast()
@@ -51,9 +45,10 @@ export function AssinaturasPage() {
   const [clienteId, setClienteId] = useState('')
   const [siteId, setSiteId] = useState('')
   const [aplicativoId, setAplicativoId] = useState('')
-  const [planoId, setPlanoId] = useState<PlanoId>('biolink')
-  const [valor, setValor] = useState(formatCurrencyInput(30))
-  const [descricao, setDescricao] = useState<string>(PLANOS_ASSINATURA[0].descricaoPadrao)
+  const [planoId, setPlanoId] = useState('')
+  const [valor, setValor] = useState('')
+  const [descricao, setDescricao] = useState('')
+  const [ciclo, setCiclo] = useState<CicloAssinatura>(CicloAssinatura.MONTHLY)
   const [proxima, setProxima] = useState(plusDaysIso(30))
   const [referencia, setReferencia] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -82,6 +77,11 @@ export function AssinaturasPage() {
   const aplicativos = useQuery({
     queryKey: ['aplicativos-mobile-lookup'],
     queryFn: () => listarAplicativosMobile({ page: 0, size: 100 }),
+    enabled: isAdmin && novoOpen,
+  })
+  const planosCatalogo = useQuery({
+    queryKey: ['planos-ativos'],
+    queryFn: () => listarPlanos({ ativo: true, page: 0, size: 100 }),
     enabled: isAdmin && novoOpen,
   })
 
@@ -127,32 +127,45 @@ export function AssinaturasPage() {
     )
   }, [aplicativos.data, clienteId, aplicativosOcupados])
 
-  const plano = PLANOS_ASSINATURA.find((p) => p.id === planoId) ?? PLANOS_ASSINATURA[0]
+  const planos = planosCatalogo.data?.content ?? []
+  const plano = planos.find((item) => String(item.id) === planoId)
 
-  function aplicarPlano(id: PlanoId, siteTipo?: TipoSite | null) {
+  useEffect(() => {
+    const lista = planosCatalogo.data?.content
+    if (!novoOpen || planoId || !lista?.[0]) return
+    aplicarPlano(lista[0].id)
+  }, [novoOpen, planosCatalogo.data, planoId])
+
+  function aplicarPlano(id: number | string, siteTipo?: TipoSite | null) {
+    const lista = planosCatalogo.data?.content ?? []
     const next =
-      PLANOS_ASSINATURA.find((p) => p.id === id) ??
-      PLANOS_ASSINATURA.find((p) => p.tipoSite === siteTipo) ??
-      PLANOS_ASSINATURA[0]
-    setPlanoId(next.id)
-    if (next.recurso === 'aplicativo') {
+      lista.find((item) => String(item.id) === String(id)) ??
+      lista.find((item) => siteTipo && item.tipo === siteTipo && item.vinculo === VinculoPlano.SITE) ??
+      lista[0]
+    if (!next) return
+    setPlanoId(String(next.id))
+    if (next.vinculo === VinculoPlano.APLICATIVO) {
       setSiteId('')
+    } else if (next.vinculo === VinculoPlano.SITE) {
+      setAplicativoId('')
     } else {
+      setSiteId('')
       setAplicativoId('')
     }
-    if (!next.manual && next.valorFixo != null) {
-      setValor(formatCurrencyInput(next.valorFixo))
-      setDescricao(next.descricaoPadrao)
-    } else if (next.manual) {
+    setCiclo(next.ciclo)
+    if (!next.valor_livre && next.valor != null) {
+      setValor(formatCurrencyInput(next.valor))
+      setDescricao(next.descricao_padrao ?? '')
+    } else {
       setValor('')
-      setDescricao('')
+      setDescricao(next.descricao_padrao ?? '')
     }
   }
 
   function onSiteChange(id: string) {
     setSiteId(id)
     const site = sitesDisponiveis.find((s) => s.id === Number(id))
-    if (site) aplicarPlano(site.tipo === TipoSite.BIOLINK ? 'biolink' : site.tipo === TipoSite.LANDING_PAGE ? 'landing_page' : site.tipo === TipoSite.SITE_COMERCIAL ? 'site_institucional' : 'outro', site.tipo)
+    if (site) aplicarPlano('', site.tipo)
   }
 
   function onAplicativoChange(id: string) {
@@ -171,15 +184,17 @@ export function AssinaturasPage() {
 
   const criar = useMutation({
     mutationFn: () => {
-      const valorFinal = plano.manual ? parseCurrency(valor) : Number(plano.valorFixo)
-      const paraAplicativo = plano.recurso === 'aplicativo'
+      const valorFinal = plano?.valor_livre ? parseCurrency(valor) : Number(plano?.valor)
+      const paraAplicativo = plano?.vinculo === VinculoPlano.APLICATIVO
+      const avulso = plano?.vinculo === VinculoPlano.NENHUM
       return criarAssinatura({
         cliente_id: Number(clienteId),
-        site_id: paraAplicativo ? undefined : Number(siteId),
+        site_id: paraAplicativo || avulso ? undefined : Number(siteId),
         aplicativo_mobile_id: paraAplicativo ? Number(aplicativoId) : undefined,
+        plano_id: plano?.id,
         valor: valorFinal,
-        descricao: descricao.trim() || plano.descricaoPadrao,
-        ciclo: CicloAssinatura.MONTHLY,
+        descricao: descricao.trim() || plano?.descricao_padrao || plano?.nome || '',
+        ciclo: plano?.valor_livre ? ciclo : (plano?.ciclo ?? CicloAssinatura.MONTHLY),
         proxima_cobranca: proxima,
         external_reference: referencia.trim() || undefined,
       })
@@ -207,7 +222,14 @@ export function AssinaturasPage() {
     setClienteId('')
     setSiteId('')
     setAplicativoId('')
-    aplicarPlano('biolink')
+    const primeiro = planosCatalogo.data?.content?.[0]
+    if (primeiro) aplicarPlano(primeiro.id)
+    else {
+      setPlanoId('')
+      setValor('')
+      setDescricao('')
+      setCiclo(CicloAssinatura.MONTHLY)
+    }
     setProxima(plusDaysIso(30))
     setReferencia('')
     setErrors({})
@@ -217,13 +239,14 @@ export function AssinaturasPage() {
   function validate() {
     const next: Record<string, string> = {}
     if (!clienteId) next.cliente_id = 'Selecione o cliente.'
-    if (plano.recurso === 'aplicativo') {
+    if (!plano) next.plano_id = 'Selecione um plano.'
+    if (plano?.vinculo === VinculoPlano.APLICATIVO) {
       if (!aplicativoId) next.aplicativo_id = 'Selecione um aplicativo sem assinatura ativa.'
-    } else if (!siteId) {
+    } else if (plano?.vinculo === VinculoPlano.SITE && !siteId) {
       next.site_id = 'Selecione um site sem assinatura ativa.'
     }
     if (!proxima) next.proxima = 'Informe a próxima cobrança.'
-    if (plano.manual) {
+    if (plano?.valor_livre) {
       const v = parseCurrency(valor)
       if (!Number.isFinite(v) || v <= 0) next.valor = 'Informe um valor válido.'
       if (!descricao.trim()) next.descricao = 'Informe a descrição.'
@@ -393,7 +416,7 @@ export function AssinaturasPage() {
                 </option>
               ))}
             </Select>
-            {plano.recurso === 'aplicativo' ? (
+            {plano?.vinculo === VinculoPlano.APLICATIVO ? (
               <Select
                 label="Aplicativo"
                 value={aplicativoId}
@@ -414,7 +437,7 @@ export function AssinaturasPage() {
                   </option>
                 ))}
               </Select>
-            ) : (
+            ) : plano?.vinculo === VinculoPlano.SITE ? (
               <Select
                 label="Site"
                 value={siteId}
@@ -435,42 +458,74 @@ export function AssinaturasPage() {
                   </option>
                 ))}
               </Select>
+            ) : (
+              <div />
             )}
           </div>
 
           <div>
             <p className="mb-2 text-sm font-medium">Plano</p>
-            <div className="grid gap-2 sm:grid-cols-2">
-              {PLANOS_ASSINATURA.map((p) => (
-                <button
-                  key={p.id}
-                  type="button"
-                  onClick={() => aplicarPlano(p.id)}
-                  className={cn(
-                    'rounded-2xl border px-4 py-3 text-left transition',
-                    planoId === p.id
-                      ? 'border-brand bg-brand-soft'
-                      : 'border-line bg-paper hover:border-ink/20',
-                  )}
-                >
-                  <p className="font-semibold">{p.titulo}</p>
-                  <p className="mt-1 text-xs text-muted">
-                    {p.manual ? 'Valor personalizado' : formatMoney(p.valorFixo)}
-                    {!p.manual && ` · ${CICLO_LABEL.MONTHLY}`}
-                  </p>
-                </button>
-              ))}
-            </div>
+            {errors.plano_id ? <p className="mb-2 text-xs text-danger">{errors.plano_id}</p> : null}
+            {planos.length === 0 ? (
+              <p className="text-sm text-muted">
+                Nenhum plano ativo. Cadastre em Financeiro → Planos.
+              </p>
+            ) : (
+              <div className="grid gap-2 sm:grid-cols-2">
+                {planos.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => aplicarPlano(item.id)}
+                    className={cn(
+                      'rounded-2xl border px-4 py-3 text-left transition',
+                      String(item.id) === planoId
+                        ? 'border-brand bg-brand-soft'
+                        : 'border-line bg-paper hover:border-ink/20',
+                    )}
+                  >
+                    <p className="font-semibold">{item.nome}</p>
+                    <p className="mt-1 text-xs text-muted">
+                      {item.valor_livre ? 'Valor personalizado' : formatMoney(item.valor)}
+                      {` · ${enumLabel(CICLO_LABEL, item.ciclo)}`}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="grid gap-3 md:grid-cols-2">
             <CurrencyInput
               label="Valor"
               value={valor}
-              disabled={!plano.manual}
+              disabled={!plano?.valor_livre}
               error={errors.valor}
               onChange={(e) => setValor(e.target.value)}
             />
+            {plano?.valor_livre ? (
+              <Select
+                label="Ciclo"
+                value={ciclo}
+                onChange={(e) => setCiclo(e.target.value as CicloAssinatura)}
+              >
+                {Object.entries(CICLO_LABEL).map(([key, label]) => (
+                  <option key={key} value={key}>
+                    {label}
+                  </option>
+                ))}
+              </Select>
+            ) : (
+              <Input
+                label="Próxima cobrança"
+                type="date"
+                value={proxima}
+                error={errors.proxima}
+                onChange={(e) => setProxima(e.target.value)}
+              />
+            )}
+          </div>
+          {plano?.valor_livre ? (
             <Input
               label="Próxima cobrança"
               type="date"
@@ -478,11 +533,11 @@ export function AssinaturasPage() {
               error={errors.proxima}
               onChange={(e) => setProxima(e.target.value)}
             />
-          </div>
+          ) : null}
           <Textarea
             label="Descrição"
             value={descricao}
-            disabled={!plano.manual}
+            disabled={!plano?.valor_livre}
             error={errors.descricao}
             onChange={(e) => setDescricao(e.target.value)}
           />
@@ -516,6 +571,7 @@ export function AssinaturasPage() {
         ) : (
           <div className="space-y-4">
             <div className="grid gap-3 md:grid-cols-2">
+              <Info label="Plano" value={assinatura.plano_nome || 'Avulso'} />
               <Info label="Valor" value={formatMoney(assinatura.valor)} />
               <Info label="Status" value={<StatusAssinaturaBadge status={assinatura.status} />} />
               <Info label="Ciclo" value={enumLabel(CICLO_LABEL, assinatura.ciclo)} />

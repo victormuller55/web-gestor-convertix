@@ -22,7 +22,7 @@ export function criarUsuario(
 
 export function alterarUsuario(
   id: number,
-  dados: { nome: string; email: string; senha?: string; ativo: boolean },
+  dados: { nome: string; email: string; senha?: string; ativo: boolean; remover_foto?: boolean },
   foto?: File | null,
 ) {
   return putMultipart<Usuario>(endpoints.usuarios.alterar + qs({ id }), dados, foto)

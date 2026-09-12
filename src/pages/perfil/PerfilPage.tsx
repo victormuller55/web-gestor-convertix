@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type ReactNode } from 'react'
+import { useState, type CSSProperties, type FormEvent, type ReactNode } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { Building2, Lock, UserRound } from 'lucide-react'
 import { alterarUsuario } from '@/lib/api/usuarios'
@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/Input'
 import { PhotoPicker } from '@/components/ui/PhotoPicker'
 import { Badge } from '@/components/ui/Badge'
 import { PageScroll } from '@/components/ui/PageFrame'
+import { cn } from '@/lib/cn'
 
 export function PerfilPage() {
   const { user, isAdmin, isCliente, setUser } = useAuth()
@@ -28,6 +29,7 @@ export function PerfilPage() {
   const [documento, setDocumento] = useState(maskDocumento(user?.documento ?? ''))
   const [telefone, setTelefone] = useState(maskTelefone(user?.telefone ?? ''))
   const [foto, setFoto] = useState<File | null>(null)
+  const [removerFoto, setRemoverFoto] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const save = useMutation({
@@ -42,6 +44,7 @@ export function PerfilPage() {
             email: email.trim(),
             senha: senha || undefined,
             ativo: user.ativo,
+            remover_foto: removerFoto || undefined,
           },
           foto,
         )
@@ -62,6 +65,7 @@ export function PerfilPage() {
             email: email.trim(),
             telefone: onlyDigits(telefone) || undefined,
             senha: senha || undefined,
+            remover_foto: removerFoto || undefined,
           },
           foto,
         )
@@ -71,7 +75,7 @@ export function PerfilPage() {
           nome_empresa: nomeEmpresa.trim(),
           documento: onlyDigits(documento),
           telefone: onlyDigits(telefone) || null,
-          foto: cliente.foto ?? user.foto,
+          foto: cliente.foto ?? null,
         })
       }
 
@@ -81,6 +85,7 @@ export function PerfilPage() {
       setUser(atualizado)
       setSenha('')
       setFoto(null)
+      setRemoverFoto(false)
       push('Perfil atualizado com sucesso.', 'success')
     },
     onError: (err) => push(err instanceof ApiError ? err.message : 'Falha ao salvar perfil.', 'error'),
@@ -109,7 +114,7 @@ export function PerfilPage() {
 
   return (
     <PageScroll>
-      <form id="perfil-form" onSubmit={onSubmit} className="flex min-h-full flex-col pb-8">
+      <form id="perfil-form" onSubmit={onSubmit} className="flex min-h-full flex-col">
         <PageHeader
           eyebrow="Conta"
           title="Meu perfil"
@@ -121,103 +126,118 @@ export function PerfilPage() {
           }
         />
 
-        <div className="grid flex-1 items-start lg:grid-cols-[minmax(16rem,20rem)_minmax(0,1fr)]">
-          <aside className="border-b border-line p-6 lg:sticky lg:top-0 lg:border-r lg:border-b-0">
-            <PhotoPicker
-              name={user.nome || user.nome_empresa || undefined}
-              currentUrl={user.foto}
-              file={foto}
-              onChange={setFoto}
-              layout="stack"
-              size="lg"
-            />
-            <div className="mt-5 border-t border-line pt-4 text-center">
-              <p className="font-display text-xl text-ink">{user.nome || user.nome_empresa}</p>
-              <p className="mt-1 truncate text-sm text-muted">{user.email}</p>
-              <div className="mt-3 flex justify-center">
-                <Badge tone={isAdmin ? 'brand' : 'info'}>{TIPO_USUARIO_LABEL[user.tipo]}</Badge>
+        <div className="p-6">
+          <div className="grid gap-4 xl:grid-cols-[0.8fr_1.2fr] xl:items-stretch">
+            <SoftCard delay={0} className="flex h-full min-h-0 flex-col items-center justify-center">
+              <PhotoPicker
+                name={user.nome || user.nome_empresa || undefined}
+                currentUrl={removerFoto ? null : user.foto}
+                file={foto}
+                onChange={(arquivo) => {
+                  setFoto(arquivo)
+                  if (arquivo) setRemoverFoto(false)
+                }}
+                onRemove={() => {
+                  setFoto(null)
+                  setRemoverFoto(true)
+                }}
+                layout="stack"
+                size="xl"
+              />
+              <div className="mt-4 text-center">
+                <p className="font-display text-lg text-ink">{user.nome || user.nome_empresa}</p>
+                <p className="mt-0.5 truncate text-sm text-muted">{user.email}</p>
+                <div className="mt-2 flex justify-center">
+                  <Badge tone={isAdmin ? 'brand' : 'info'}>{TIPO_USUARIO_LABEL[user.tipo]}</Badge>
+                </div>
+                {removerFoto && !foto ? (
+                  <p className="mt-2 text-xs text-muted">Foto será removida ao salvar.</p>
+                ) : null}
               </div>
-            </div>
-          </aside>
+            </SoftCard>
 
-          <div>
-            <Section
-              icon={<UserRound className="size-4" />}
-              title="Dados da conta"
-              description="Como você aparece no gestor e o e-mail usado para entrar."
-            >
-              <div className="grid gap-4 md:grid-cols-2">
-                {isAdmin ? (
+            <div className="grid gap-4">
+              <SectionCard
+                delay={1}
+                icon={<UserRound className="size-4" />}
+                title="Dados da conta"
+                description="Como você aparece no gestor e o e-mail usado para entrar."
+              >
+                <div className="grid gap-4 md:grid-cols-2">
+                  {isAdmin ? (
+                    <Input
+                      label="Nome"
+                      value={nome}
+                      error={errors.nome}
+                      onChange={(e) => setNome(e.target.value)}
+                    />
+                  ) : (
+                    <Input
+                      label="Nome"
+                      value={user.nome ?? ''}
+                      disabled
+                      hint="Nome de exibição da conta. Não pode ser alterado por aqui."
+                    />
+                  )}
                   <Input
-                    label="Nome"
-                    value={nome}
-                    error={errors.nome}
-                    onChange={(e) => setNome(e.target.value)}
+                    label="E-mail"
+                    type="email"
+                    value={email}
+                    error={errors.email}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
-                ) : (
-                  <Input
-                    label="Nome"
-                    value={user.nome ?? ''}
-                    disabled
-                    hint="Nome de exibição da conta. Não pode ser alterado por aqui."
-                  />
-                )}
-                <Input
-                  label="E-mail"
-                  type="email"
-                  value={email}
-                  error={errors.email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-            </Section>
+                </div>
+              </SectionCard>
 
-            {isCliente && (
-              <Section
-                icon={<Building2 className="size-4" />}
-                title="Dados da empresa"
-                description="Informações cadastrais usadas em cobranças e no contrato."
+              {isCliente && (
+                <SectionCard
+                  delay={2}
+                  icon={<Building2 className="size-4" />}
+                  title="Dados da empresa"
+                  description="Informações cadastrais usadas em cobranças e no contrato."
+                >
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <Input
+                      label="Nome da empresa"
+                      className="md:col-span-2"
+                      value={nomeEmpresa}
+                      error={errors.nome_empresa}
+                      onChange={(e) => setNomeEmpresa(e.target.value)}
+                    />
+                    <Input
+                      label="CPF ou CNPJ"
+                      value={documento}
+                      error={errors.documento}
+                      onChange={(e) => setDocumento(maskDocumento(e.target.value))}
+                    />
+                    <Input
+                      label="Telefone"
+                      value={telefone}
+                      onChange={(e) => setTelefone(maskTelefone(e.target.value))}
+                    />
+                  </div>
+                </SectionCard>
+              )}
+
+              <SectionCard
+                delay={isCliente ? 3 : 2}
+                icon={<Lock className="size-4" />}
+                title="Senha de acesso"
+                description="Deixe em branco se não quiser trocar a senha agora."
               >
                 <div className="grid gap-4 md:grid-cols-2">
                   <Input
-                    label="Nome da empresa"
-                    className="md:col-span-2"
-                    value={nomeEmpresa}
-                    error={errors.nome_empresa}
-                    onChange={(e) => setNomeEmpresa(e.target.value)}
-                  />
-                  <Input
-                    label="CPF ou CNPJ"
-                    value={documento}
-                    error={errors.documento}
-                    onChange={(e) => setDocumento(maskDocumento(e.target.value))}
-                  />
-                  <Input
-                    label="Telefone"
-                    value={telefone}
-                    onChange={(e) => setTelefone(maskTelefone(e.target.value))}
+                    label="Nova senha"
+                    type="password"
+                    autoComplete="new-password"
+                    hint="Opcional. Mínimo de 8 caracteres."
+                    value={senha}
+                    error={errors.senha}
+                    onChange={(e) => setSenha(e.target.value)}
                   />
                 </div>
-              </Section>
-            )}
-
-            <Section
-              icon={<Lock className="size-4" />}
-              title="Senha de acesso"
-              description="Deixe em branco se não quiser trocar a senha agora."
-            >
-              <div className="grid gap-4 md:grid-cols-2">
-                <Input
-                  label="Nova senha"
-                  type="password"
-                  autoComplete="new-password"
-                  hint="Opcional. Mínimo de 8 caracteres."
-                  value={senha}
-                  error={errors.senha}
-                  onChange={(e) => setSenha(e.target.value)}
-                />
-              </div>
-            </Section>
+              </SectionCard>
+            </div>
           </div>
         </div>
       </form>
@@ -225,30 +245,51 @@ export function PerfilPage() {
   )
 }
 
-function Section({
+function SectionCard({
+  delay = 0,
   icon,
   title,
   description,
   children,
 }: {
+  delay?: number
   icon: ReactNode
   title: string
   description: string
   children: ReactNode
 }) {
   return (
-    <section className="border-b border-line p-6">
-      <div className="mb-5 flex items-start gap-3 border-b border-line pb-4">
+    <SoftCard delay={delay}>
+      <div className="mb-4 flex items-start gap-3">
         <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-paper text-brand">
           {icon}
         </span>
         <div>
-          <h2 className="font-semibold text-ink">{title}</h2>
-          <p className="mt-0.5 text-sm text-muted">{description}</p>
+          <h3 className="font-display text-lg">{title}</h3>
+          <p className="mt-1 text-xs text-muted">{description}</p>
         </div>
       </div>
       {children}
-    </section>
+    </SoftCard>
+  )
+}
+
+function SoftCard({
+  delay = 0,
+  className,
+  children,
+}: {
+  delay?: number
+  className?: string
+  children: ReactNode
+}) {
+  return (
+    <div
+      className={cn('card-enter rounded-2xl border border-line bg-card p-5', className)}
+      style={{ '--card-delay': `${delay * 55}ms` } as CSSProperties}
+    >
+      {children}
+    </div>
   )
 }
 

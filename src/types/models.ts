@@ -1,5 +1,6 @@
 import type {
   CicloAssinatura,
+  EtapaProjeto,
   FormaPagamento,
   SituacaoAssinaturaSite,
   StatusAplicativoMobile,
@@ -7,9 +8,13 @@ import type {
   StatusPagamento,
   StatusSite,
   TipoProdutoCobranca,
+  TipoProjeto,
   TipoSite,
   TipoUsuario,
   BioLinkItemIcone,
+  VinculoPlano,
+  TipoLandingPageCampo,
+  StatusLandingPageLead,
 } from './enums'
 
 export interface PageResponse<T> {
@@ -183,6 +188,8 @@ export interface Assinatura {
   site_tipo?: TipoSite | null
   aplicativo_mobile_id?: number | null
   aplicativo_mobile_nome?: string | null
+  plano_id?: number | null
+  plano_nome?: string | null
   asaas_subscription_id?: string | null
   valor: number
   descricao: string
@@ -231,4 +238,107 @@ export interface RecuperarSenhaResponse {
   mensagem?: string
   enviado_em?: string
   expira_em?: string
+}
+
+export interface HistoricoEtapaProjeto {
+  id: number
+  etapa_anterior?: EtapaProjeto | null
+  etapa_nova: EtapaProjeto
+  origem?: string | null
+  mensagem?: string | null
+  created_at?: string
+}
+
+export interface Projeto {
+  id: number
+  cliente_id: number
+  cliente_nome_empresa?: string | null
+  titulo: string
+  tipo: TipoProjeto
+  etapa: EtapaProjeto
+  site_id?: number | null
+  site_nome?: string | null
+  aplicativo_mobile_id?: number | null
+  aplicativo_mobile_nome?: string | null
+  prazo?: string | null
+  descricao?: string | null
+  observacao_interna?: string | null
+  historico_etapa?: HistoricoEtapaProjeto[]
+  created_at?: string
+  updated_at?: string
+}
+
+export interface Plano {
+  id: number
+  codigo?: string | null
+  nome: string
+  tipo: TipoProjeto
+  vinculo: VinculoPlano
+  valor?: number | null
+  valor_livre: boolean
+  ciclo: CicloAssinatura
+  descricao_padrao?: string | null
+  ativo: boolean
+  ordem: number
+  created_at?: string
+  updated_at?: string
+}
+
+export interface LandingPage {
+  id: number
+  site_id: number
+  site_nome?: string | null
+  cliente_id?: number | null
+  cliente_nome_empresa?: string | null
+  slug: string
+  quantidade_formularios?: number | null
+  quantidade_leads?: number | null
+  created_at?: string
+  updated_at?: string
+}
+
+export interface LandingPageFormulario {
+  id: number
+  landing_page_id: number
+  nome: string
+  titulo: string
+  descricao?: string | null
+  texto_botao: string
+  ativo: boolean
+  created_at?: string
+  updated_at?: string
+}
+
+export interface LandingPageCampo {
+  id: number
+  formulario_id: number
+  nome_interno: string
+  label: string
+  tipo: TipoLandingPageCampo
+  placeholder?: string | null
+  obrigatorio: boolean
+  ordem: number
+  ativo: boolean
+  created_at?: string
+  updated_at?: string
+}
+
+export interface LandingPageLead {
+  id: number
+  landing_page_id: number
+  landing_page_slug?: string | null
+  site_nome?: string | null
+  cliente_nome_empresa?: string | null
+  formulario_id: number
+  formulario_nome?: string | null
+  nome?: string | null
+  email?: string | null
+  telefone?: string | null
+  ip?: string | null
+  origem?: string | null
+  user_agent?: string | null
+  status: StatusLandingPageLead
+  observacao?: string | null
+  respostas?: Record<string, string>
+  created_at?: string
 }

@@ -15,6 +15,10 @@ import { BioLinksPage } from '@/pages/biolinks/BioLinksPage'
 import { FinanceiroPage } from '@/pages/financeiro/FinanceiroPage'
 import { PagamentosPage } from '@/pages/pagamentos/PagamentosPage'
 import { AssinaturasPage } from '@/pages/assinaturas/AssinaturasPage'
+import { ProjetosPage } from '@/pages/projetos/ProjetosPage'
+import { PlanosPage } from '@/pages/planos/PlanosPage'
+import { LandingPagesPage } from '@/pages/landing-pages/LandingPagesPage'
+import { LeadsPage } from '@/pages/leads/LeadsPage'
 import { PerfilPage } from '@/pages/perfil/PerfilPage'
 
 const queryClient = new QueryClient({
@@ -47,6 +51,9 @@ export default function App() {
                     <Route path="assinaturas" element={<AssinaturasPage />} />
                     <Route path="biolink" element={<BioLinksPage />} />
                     <Route path="aplicativos-mobile" element={<AplicativosMobilePage />} />
+                    <Route path="projetos" element={<ProjetosPage />} />
+                    <Route path="landing-pages" element={<LandingPagesPage />} />
+                    <Route path="leads" element={<LeadsPage />} />
                     <Route path="perfil" element={<PerfilPage />} />
 
                     <Route element={<ProtectedRoute adminOnly />}>
@@ -54,6 +61,7 @@ export default function App() {
                       <Route path="clientes" element={<ClientesPage />} />
                       <Route path="sites" element={<SitesPage />} />
                       <Route path="biolinks" element={<BioLinksPage />} />
+                      <Route path="planos" element={<PlanosPage />} />
                     </Route>
                   </Route>
                 </Route>

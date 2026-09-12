@@ -19,6 +19,7 @@ export function criarAssinatura(dados: {
   cliente_id?: number
   site_id?: number
   aplicativo_mobile_id?: number
+  plano_id?: number
   valor: number
   descricao: string
   ciclo: CicloAssinatura

@@ -85,6 +85,64 @@ export const StatusAplicativoMobile = {
 export type StatusAplicativoMobile =
   (typeof StatusAplicativoMobile)[keyof typeof StatusAplicativoMobile]
 
+export const TipoProjeto = {
+  BIOLINK: 'BIOLINK',
+  LANDING_PAGE: 'LANDING_PAGE',
+  SITE_COMERCIAL: 'SITE_COMERCIAL',
+  APLICATIVO_MOBILE: 'APLICATIVO_MOBILE',
+  OUTRO: 'OUTRO',
+} as const
+export type TipoProjeto = (typeof TipoProjeto)[keyof typeof TipoProjeto]
+
+export const EtapaProjeto = {
+  BRIEFING: 'BRIEFING',
+  EM_ANDAMENTO: 'EM_ANDAMENTO',
+  HOMOLOGACAO: 'HOMOLOGACAO',
+  CONCLUIDO: 'CONCLUIDO',
+  PAUSADO: 'PAUSADO',
+  CANCELADO: 'CANCELADO',
+} as const
+export type EtapaProjeto = (typeof EtapaProjeto)[keyof typeof EtapaProjeto]
+
+export const ETAPAS_PROJETO = [
+  EtapaProjeto.BRIEFING,
+  EtapaProjeto.EM_ANDAMENTO,
+  EtapaProjeto.HOMOLOGACAO,
+  EtapaProjeto.CONCLUIDO,
+  EtapaProjeto.PAUSADO,
+  EtapaProjeto.CANCELADO,
+] as const
+
+export const VinculoPlano = {
+  SITE: 'SITE',
+  APLICATIVO: 'APLICATIVO',
+  NENHUM: 'NENHUM',
+} as const
+export type VinculoPlano = (typeof VinculoPlano)[keyof typeof VinculoPlano]
+
+export const TipoLandingPageCampo = {
+  TEXT: 'TEXT',
+  EMAIL: 'EMAIL',
+  PHONE: 'PHONE',
+  NUMBER: 'NUMBER',
+  TEXTAREA: 'TEXTAREA',
+  SELECT: 'SELECT',
+  CHECKBOX: 'CHECKBOX',
+  RADIO: 'RADIO',
+  DATE: 'DATE',
+} as const
+export type TipoLandingPageCampo = (typeof TipoLandingPageCampo)[keyof typeof TipoLandingPageCampo]
+
+export const StatusLandingPageLead = {
+  NOVO: 'NOVO',
+  EM_ATENDIMENTO: 'EM_ATENDIMENTO',
+  NEGOCIANDO: 'NEGOCIANDO',
+  CONVERTIDO: 'CONVERTIDO',
+  PERDIDO: 'PERDIDO',
+} as const
+export type StatusLandingPageLead =
+  (typeof StatusLandingPageLead)[keyof typeof StatusLandingPageLead]
+
 export const BioLinkItemIcone = {
   WHATSAPP: 'WHATSAPP',
   INSTAGRAM: 'INSTAGRAM',
@@ -109,54 +167,6 @@ export const BioLinkItemIcone = {
   OUTROS: 'OUTROS',
 } as const
 export type BioLinkItemIcone = (typeof BioLinkItemIcone)[keyof typeof BioLinkItemIcone]
-
-export const PLANOS_ASSINATURA = [
-  {
-    id: 'biolink',
-    titulo: 'BioLink Profissional',
-    tipoSite: TipoSite.BIOLINK,
-    valorFixo: 30,
-    descricaoPadrao: 'Assinatura mensal BioLink Profissional',
-    manual: false,
-    recurso: 'site',
-  },
-  {
-    id: 'landing_page',
-    titulo: 'Landing Page',
-    tipoSite: TipoSite.LANDING_PAGE,
-    valorFixo: 90,
-    descricaoPadrao: 'Assinatura mensal Landing Page',
-    manual: false,
-    recurso: 'site',
-  },
-  {
-    id: 'site_institucional',
-    titulo: 'Site Institucional Completo',
-    tipoSite: TipoSite.SITE_COMERCIAL,
-    valorFixo: 170,
-    descricaoPadrao: 'Assinatura mensal Site Institucional Completo',
-    manual: false,
-    recurso: 'site',
-  },
-  {
-    id: 'aplicativo_mobile',
-    titulo: 'Aplicativo Mobile',
-    tipoSite: null,
-    valorFixo: null,
-    descricaoPadrao: '',
-    manual: true,
-    recurso: 'aplicativo',
-  },
-  {
-    id: 'outro',
-    titulo: 'Outro valor',
-    tipoSite: null,
-    valorFixo: null,
-    descricaoPadrao: '',
-    manual: true,
-    recurso: 'site',
-  },
-] as const
 
 export function isPagamentoPago(status?: StatusPagamento | null) {
   return status === StatusPagamento.RECEIVED || status === StatusPagamento.CONFIRMED
